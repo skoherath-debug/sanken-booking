@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SankenOverseas – Room Booking</title>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  // ============================================================
+  //  🔧 PASTE YOUR FIREBASE CONFIG HERE (free — see README below)
+  // ============================================================
+  const firebaseConfig = {
+    apiKey:            "AIzaSyA4D0lxYO339x-9B1M_nOgYbZTNklOqTlM",
+    authDomain:        "sanken-booking-df980.firebaseapp.com",
+    databaseURL:       "https://sanken-booking-df980-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "sanken-booking-df980",
+    storageBucket:     "sanken-booking-df980.firebasestorage.app",
+    messagingSenderId: "38788887699",
+    appId:             "1:38788887699:web:eb7a6fde5c9e5a3bf48966",
+    measurementId:     "G-Y0DXH9ZQ20"
+  };
+  // ============================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getDatabase(app);
+
+  // Expose helpers to window so inline JS can use them
+  window._fb = { db, ref, set, remove, onValue };
+  window.dispatchEvent(new Event("firebase-ready"));
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ── Tokens ─────────────────────────────────────────────── */
+:root {
+  --bg:       #f5f2eb;
+  --surface:  #ffffff;
+  --ink:      #1a1814;
+  --muted:    #8a8679;
+  --border:   #dedad2;
+  --r1:       #c84b31;   /* room 1 accent */
+  --r2:       #2a6496;   /* room 2 accent */
+  --avail:    #3a7d44;
+  --mine:     #2a6496;
+  --taken:    #c84b31;
+  --yellow:   #e8b84b;
+  --radius:   14px;
+  --shadow:   0 2px 16px rgba(26,24,20,.08);
+}
+
+/* ── Base ───────────────────────────────────────────────── */
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Epilogue', sans-serif;
+  min-height: 100vh;
+  padding: 28px 16px 60px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+.header {
+  max-width: 680px;
+  margin: 0 auto 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 20px;
+}
+
+.header-left h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.header-left p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-top: 6px;
+}
+
+.user-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: 40px;
+  padding: 8px 16px 8px 8px;
+}
+
+.user-chip .avatar {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: var(--yellow);
+  color: var(--ink);
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+}
+
+.user-chip input {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-family: 'Epilogue', sans-serif;
+  font-size: 0.88rem;
+  outline: none;
+  width: 140px;
+}
+
+.user-chip input::placeholder { color: rgba(255,255,255,.45); }
+
+/* ── Date Nav ───────────────────────────────────────────── */
+.date-row {
+  max-width: 680px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.date-row .date-label {
+  flex: 1;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: clamp(0.95rem, 2vw, 1.15rem);
+}
+
+.date-row .today-tag {
+  background: var(--yellow);
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 20px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.nav-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  color: var(--ink);
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.1rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.nav-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+
+.today-btn {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  font-family: 'Epilogue', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0 14px;
+  height: 38px;
+  border-radius: 40px;
+  cursor: pointer;
+  transition: all .15s;
+  flex-shrink: 0;
+}
+.today-btn:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ── Status banner ──────────────────────────────────────── */
+#statusBanner {
+  max-width: 680px;
+  margin: 0 auto 20px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  display: none;
+}
+#statusBanner.info  { background: #e8f4fd; color: #2a6496; border: 1px solid #b8d9f0; display:block; }
+#statusBanner.error { background: #fdf0ee; color: #c84b31; border: 1px solid #f0c4bc; display:block; }
+#statusBanner.ok    { background: #eef6f0; color: #3a7d44; border: 1px solid #b8ddbf; display:block; }
+
+/* ── Rooms Grid ─────────────────────────────────────────── */
+.rooms-grid {
+  max-width: 680px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+/* ── Room Card ──────────────────────────────────────────── */
+.room-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+}
+
+.room-card-header {
+  padding: 18px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.room-stripe {
+  width: 6px;
+  height: 38px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.room-card-header h2 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
+.room-card-header .cap {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+}
+
+/* ── Slots ──────────────────────────────────────────────── */
+.slots-list {
+  padding: 0 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.slots-list::-webkit-scrollbar { width: 4px; }
+.slots-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  transition: all .15s;
+  background: var(--bg);
+}
+
+.slot.available { cursor: pointer; }
+.slot.available:hover { border-color: var(--avail); background: #eef6f0; }
+
+.slot.taken {
+  background: #fdf0ee;
+  border-color: #f0c4bc;
+}
+
+.slot.mine {
+  background: #eef3fa;
+  border-color: #b8d3f0;
+  cursor: pointer;
+}
+
+.slot-indicator {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.slot.available .slot-indicator { background: var(--avail); }
+.slot.taken     .slot-indicator { background: var(--taken); }
+.slot.mine      .slot-indicator { background: var(--mine); }
+
+.slot-time {
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-width: 92px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.slot-info { flex: 1; }
+.slot-info .who    { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
+.slot-info .why    { font-size: 0.74rem; color: var(--muted); }
+.slot-info .free   { font-size: 0.8rem; color: var(--avail); font-weight: 500; }
+
+.slot-btn {
+  font-size: 0.73rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: 'Epilogue', sans-serif;
+  transition: all .15s;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.btn-book   { background: var(--ink); color: #fff; }
+.btn-book:hover { background: #3a3830; }
+.btn-cancel { background: transparent; color: var(--taken); border: 1.5px solid var(--taken) !important; }
+.btn-cancel:hover { background: var(--taken); color: #fff; }
+
+/* ── Modal ──────────────────────────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(26,24,20,.55);
+  backdrop-filter: blur(3px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.overlay.open { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 30px;
+  width: 100%; max-width: 420px;
+  box-shadow: 0 24px 60px rgba(26,24,20,.18);
+  animation: pop .22s cubic-bezier(.34,1.56,.64,1);
+}
+
+@keyframes pop {
+  from { opacity:0; transform: scale(.93) translateY(12px); }
+  to   { opacity:1; transform: scale(1) translateY(0); }
+}
+
+.modal-room-tag {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 10px;
+}
+
+.modal h3 {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  margin-bottom: 4px;
+}
+
+.modal .slot-detail {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 24px;
+}
+
+.form-group { margin-bottom: 16px; }
+
+.form-group label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--muted);
+  margin-bottom: 7px;
+}
+
+.form-group input {
+  width: 100%;
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  color: var(--ink);
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-family: 'Epilogue', sans-serif;
+  outline: none;
+  transition: border-color .2s;
+}
+.form-group input:focus { border-color: var(--ink); }
+
+.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
+
+.btn-confirm {
+  flex: 1;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  padding: 13px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  font-family: 'Syne', sans-serif;
+  transition: background .15s;
+}
+.btn-confirm:hover { background: #3a3830; }
+
+.btn-dismiss {
+  flex: 1;
+  background: transparent;
+  color: var(--muted);
+  border: 1.5px solid var(--border);
+  padding: 13px;
+  border-radius: 10px;
+  font-weight: 500;
+  font-size: 0.88rem;
+  cursor: pointer;
+  font-family: 'Epilogue', sans-serif;
+  transition: all .15s;
+}
+.btn-dismiss:hover { border-color: var(--ink); color: var(--ink); }
+
+/* ── Legend ─────────────────────────────────────────────── */
+.legend {
+  max-width: 680px;
+  margin: 28px auto 0;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+.legend-item { display: flex; align-items: center; gap: 6px; }
+.legend-dot  { width: 8px; height: 8px; border-radius: 50%; }
+
+/* ── Setup Notice ───────────────────────────────────────── */
+#setupNotice {
+  max-width: 680px;
+  margin: 0 auto 24px;
+  background: #fffbea;
+  border: 1.5px solid #f5d76e;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+}
+#setupNotice strong { font-family: 'Syne', sans-serif; display:block; margin-bottom:4px; font-size:0.95rem; }
+#setupNotice code {
+  background: rgba(0,0,0,.07);
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.82rem;
+}
+</style>
+</head>
+<body>
+
+<!-- Firebase configured for SankenOverseas -->
+
+<!-- Header -->
+<div class="header">
+  <div class="header-left">
+    <h1>SankenOverseas</h1>
+    <p>Boardroom Booking · Pvt Ltd</p>
+  </div>
+  <div class="user-chip">
+    <div class="avatar" id="avatarLetter">?</div>
+    <input type="text" id="userNameInput" placeholder="Your name…" maxlength="30" autocomplete="off">
+  </div>
+</div>
+
+<!-- Status -->
+<div id="statusBanner"></div>
+
+<!-- Date navigation -->
+<div class="date-row">
+  <button class="nav-btn" onclick="changeDay(-1)">‹</button>
+  <div style="flex:1">
+    <div class="date-label" id="dateLabel"></div>
+  </div>
+  <button class="nav-btn" onclick="changeDay(1)">›</button>
+  <button class="today-btn" onclick="goToday()">Today</button>
+</div>
+
+<!-- Rooms -->
+<div class="rooms-grid" id="roomsGrid"></div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:var(--avail)"></div> Available</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--taken)"></div> Booked by others</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--mine)"></div> Your booking</div>
+</div>
+
+<!-- Modal -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div class="modal-room-tag" id="modalRoomTag"></div>
+    <h3 id="modalTitle">Book Slot</h3>
+    <div class="slot-detail" id="modalDetail"></div>
+    <div class="form-group">
+      <label>Your Name</label>
+      <input type="text" id="mName" placeholder="e.g. Kasun Perera" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label>Meeting Purpose</label>
+      <input type="text" id="mPurpose" placeholder="e.g. Weekly sync, Client call…" maxlength="60">
+    </div>
+    <div class="modal-actions">
+      <button class="btn-dismiss" onclick="closeModal()">Cancel</button>
+      <button class="btn-confirm" onclick="confirmBooking()">🔒 Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// Config
+// ─────────────────────────────────────────────
+const ROOMS = [
+  { id: 'room1', name: 'Boardroom', capacity: '8 people', color: '#c84b31' }
+];
+
+// Half-hour slots 08:00 → 18:00
+const SLOTS = [];
+for (let h = 8; h < 18; h++) {
+  SLOTS.push(`${String(h).padStart(2,'0')}:00`);
+  SLOTS.push(`${String(h).padStart(2,'0')}:30`);
+}
+
+// ─────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────
+let currentDate = today();
+let userName    = '';
+let bookings    = {};   // key → { name, purpose, bookedAt }
+let pendingSlot = null;
+let firebaseReady = false;
+let dbListeners   = {};
+
+// ─────────────────────────────────────────────
+// Helpers
+// ─────────────────────────────────────────────
+function today() {
+  const d = new Date(); d.setHours(0,0,0,0); return d;
+}
+
+function dateKey(d) {
+  return d.toISOString().slice(0,10);
+}
+
+function slotKey(roomId, time) {
+  return `${roomId}__${dateKey(currentDate)}__${time.replace(':','h')}`;
+}
+
+function formatDate(d) {
+  return d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+function isToday(d) {
+  return d.getTime() === today().getTime();
+}
+
+function nextTime(t) {
+  const [h,m] = t.split(':').map(Number);
+  const total = h*60 + m + 30;
+  return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
+}
+
+// ─────────────────────────────────────────────
+// Local storage fallback
+// ─────────────────────────────────────────────
+function localGet()    { try { return JSON.parse(localStorage.getItem('mbookings')||'{}'); } catch { return {}; } }
+function localSet(b)   { localStorage.setItem('mbookings', JSON.stringify(b)); }
+
+// ─────────────────────────────────────────────
+// Firebase integration
+// ─────────────────────────────────────────────
+window.addEventListener('firebase-ready', () => {
+  const cfg = document.querySelector('script[type="module"]').textContent;
+  if (cfg.includes('YOUR_API_KEY')) {
+    showStatus('Firebase not configured yet — running in single-device demo mode.', 'info');
+    bookings = localGet();
+    render();
+    return;
+  }
+  firebaseReady = true;
+  document.getElementById('setupNotice').style.display = 'none';
+  showStatus('Connected — bookings sync in real time ✓', 'ok');
+  setTimeout(() => hideStatus(), 3000);
+  subscribeToDate();
+});
+
+function subscribeToDate() {
+  if (!firebaseReady) return;
+  const { db, ref, onValue } = window._fb;
+  const path = `bookings/${dateKey(currentDate)}`;
+  // Unsubscribe previous
+  if (dbListeners[path]) dbListeners[path]();
+  const r = ref(db, path);
+  const unsub = onValue(r, snap => {
+    bookings = snap.val() || {};
+    render();
+  });
+  dbListeners[path] = unsub;
+}
+
+async function fbSet(key, data) {
+  if (!firebaseReady) { const b=localGet(); b[key]=data; localSet(b); bookings=localGet(); render(); return; }
+  const { db, ref, set } = window._fb;
+  const [roomId, date, time] = key.split('__');
+  await set(ref(db, `bookings/${date}/${key}`), data);
+}
+
+async function fbRemove(key) {
+  if (!firebaseReady) { const b=localGet(); delete b[key]; localSet(b); bookings=localGet(); render(); return; }
+  const { db, ref, remove } = window._fb;
+  const [roomId, date, time] = key.split('__');
+  await remove(ref(db, `bookings/${date}/${key}`));
+}
+
+// ─────────────────────────────────────────────
+// Render
+// ─────────────────────────────────────────────
+function render() {
+  // Date label
+  document.getElementById('dateLabel').innerHTML =
+    `${formatDate(currentDate)}${isToday(currentDate) ? ' <span class="today-tag">Today</span>' : ''}`;
+
+  const grid = document.getElementById('roomsGrid');
+  grid.innerHTML = '';
+
+  ROOMS.forEach(room => {
+    const card = document.createElement('div');
+    card.className = 'room-card';
+    card.innerHTML = `
+      <div class="room-card-header">
+        <div class="room-stripe" style="background:${room.color}"></div>
+        <h2>${room.name}</h2>
+        <span class="cap">👥 ${room.capacity}</span>
+      </div>
+      <div class="slots-list" id="sl_${room.id}"></div>
+    `;
+    grid.appendChild(card);
+
+    const list = card.querySelector(`#sl_${room.id}`);
+    SLOTS.forEach(time => {
+      const key  = slotKey(room.id, time);
+      const end  = nextTime(time);
+      const bk   = bookings[key];
+      const mine = bk && bk.name === userName && userName.trim() !== '';
+      const cls  = bk ? (mine ? 'mine' : 'taken') : 'available';
+
+      const slot = document.createElement('div');
+      slot.className = `slot ${cls}`;
+
+      let infoHTML = '';
+      let btnHTML  = '';
+
+      if (bk) {
+        infoHTML = `<div class="slot-info"><div class="who">${esc(bk.name)}</div><div class="why">${esc(bk.purpose)}</div></div>`;
+        if (mine) btnHTML = `<button class="slot-btn btn-cancel" onclick="cancelSlot('${key}')">Cancel</button>`;
+      } else {
+        infoHTML = `<div class="slot-info"><span class="free">Available</span></div>`;
+        btnHTML  = `<button class="slot-btn btn-book" onclick="openModal('${room.id}','${esc(room.name)}','${time}','${end}','${room.color}')">Book</button>`;
+      }
+
+      slot.innerHTML = `
+        <div class="slot-indicator"></div>
+        <div class="slot-time">${time} – ${end}</div>
+        ${infoHTML}
+        ${btnHTML}
+      `;
+      list.appendChild(slot);
+    });
+  });
+}
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+// ─────────────────────────────────────────────
+// Date navigation
+// ─────────────────────────────────────────────
+function changeDay(n) {
+  currentDate = new Date(currentDate);
+  currentDate.setDate(currentDate.getDate() + n);
+  subscribeToDate();
+  if (!firebaseReady) render();
+}
+
+function goToday() {
+  currentDate = today();
+  subscribeToDate();
+  if (!firebaseReady) render();
+}
+
+// ─────────────────────────────────────────────
+// Booking modal
+// ─────────────────────────────────────────────
+function openModal(roomId, roomName, time, end, color) {
+  if (!userName.trim()) {
+    showStatus('Please enter your name at the top first.', 'error');
+    document.getElementById('userNameInput').focus();
+    return;
+  }
+  pendingSlot = { roomId, time };
+  const tag = document.getElementById('modalRoomTag');
+  tag.textContent = roomName;
+  tag.style.background = color + '22';
+  tag.style.color       = color;
+  document.getElementById('modalTitle').textContent   = `${time} – ${end}`;
+  document.getElementById('modalDetail').textContent  = formatDate(currentDate);
+  document.getElementById('mName').value    = userName;
+  document.getElementById('mPurpose').value = '';
+  document.getElementById('overlay').classList.add('open');
+  setTimeout(() => document.getElementById('mPurpose').focus(), 120);
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  pendingSlot = null;
+}
+
+async function confirmBooking() {
+  const name    = document.getElementById('mName').value.trim();
+  const purpose = document.getElementById('mPurpose').value.trim();
+  if (!name)    { showStatus('Please enter your name.', 'error'); return; }
+  if (!purpose) { showStatus('Please describe the meeting purpose.', 'error'); return; }
+
+  const key = slotKey(pendingSlot.roomId, pendingSlot.time);
+  if (bookings[key]) { showStatus('Slot just got taken — please choose another.', 'error'); closeModal(); return; }
+
+  userName = name;
+  updateAvatar();
+
+  await fbSet(key, { name, purpose, bookedAt: Date.now() });
+  closeModal();
+  showStatus('Room booked successfully! 🎉', 'ok');
+  setTimeout(() => hideStatus(), 3000);
+}
+
+async function cancelSlot(key) {
+  if (!confirm('Cancel your booking for this slot?')) return;
+  await fbRemove(key);
+  showStatus('Booking cancelled.', 'info');
+  setTimeout(() => hideStatus(), 2500);
+}
+
+// ─────────────────────────────────────────────
+// Name input
+// ─────────────────────────────────────────────
+document.getElementById('userNameInput').addEventListener('input', function() {
+  userName = this.value.trim();
+  updateAvatar();
+  render();
+});
+
+function updateAvatar() {
+  const el = document.getElementById('avatarLetter');
+  el.textContent = userName ? userName[0].toUpperCase() : '?';
+}
+
+// ─────────────────────────────────────────────
+// Status banner
+// ─────────────────────────────────────────────
+function showStatus(msg, type) {
+  const el = document.getElementById('statusBanner');
+  el.textContent = msg;
+  el.className = type;
+}
+function hideStatus() {
+  const el = document.getElementById('statusBanner');
+  el.className = '';
+  el.style.display = 'none';
+  el.textContent = '';
+}
+
+// ─────────────────────────────────────────────
+// Close modal on overlay click
+// ─────────────────────────────────────────────
+document.getElementById('overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ─────────────────────────────────────────────
+// Init (fallback if Firebase module doesn't fire)
+// ─────────────────────────────────────────────
+setTimeout(() => {
+  if (!firebaseReady) {
+    bookings = localGet();
+    render();
+  }
+}, 800);
+
+// Initial render
+render();
+</script>
+</body>
+</html>
