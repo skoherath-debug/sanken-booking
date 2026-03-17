@@ -2,8 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SankenOverseas – Boardroom</title>
+
+<!-- PWA Meta -->
+<meta name="application-name" content="Sanken Booking">
+<meta name="apple-mobile-web-app-title" content="Sanken Booking">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0f1117">
+<meta name="description" content="SankenOverseas Pvt Ltd — Boardroom Booking System">
+<meta name="msapplication-TileColor" content="#f5c542">
+
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/json;charset=utf-8,{
+  %22name%22:%22SankenOverseas%20Boardroom%22,
+  %22short_name%22:%22Sanken%20Booking%22,
+  %22description%22:%22Boardroom%20Reservation%20System%22,
+  %22start_url%22:%22.%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%230f1117%22,
+  %22theme_color%22:%22%23f5c542%22,
+  %22orientation%22:%22portrait-primary%22,
+  %22icons%22:[{
+    %22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='32'%20fill='%23f5c542'/%3E%3Ctext%20x='96'%20y='130'%20font-family='Arial'%20font-size='110'%20font-weight='900'%20text-anchor='middle'%20fill='%23000'%3ES%3C/text%3E%3C/svg%3E%22,
+    %22sizes%22:%22192x192%22,
+    %22type%22:%22image/svg+xml%22,
+    %22purpose%22:%22any%20maskable%22
+  }]
+}">
+
+<!-- Apple Touch Icon (gold S on dark) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23f5c542'/><text x='90' y='130' font-family='Arial Black,Arial' font-size='115' font-weight='900' text-anchor='middle' fill='%23000'>S</text></svg>">
+
+<!-- Favicon -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f5c542'/><text x='16' y='23' font-family='Arial Black,Arial' font-size='20' font-weight='900' text-anchor='middle' fill='%23000'>S</text></svg>">
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -37,7 +71,11 @@
   --text:#f0f2f8;--muted:#7b8ab8;--muted2:#4a5580;
   --font:'Plus Jakarta Sans',sans-serif;
 }
-body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;
+  padding-bottom:env(safe-area-inset-bottom);
+  padding-left:env(safe-area-inset-left);
+  padding-right:env(safe-area-inset-right);
+}
 
 /* HERO */
 .hero{
@@ -1101,6 +1139,88 @@ function hideStatus(){document.getElementById('statusBar').classList.remove('sho
 // ─── Init ─────────────────────────────────────────────
 setTimeout(()=>{if(!firebaseOK){bookings={};render();}},900);
 render();
+
+// ─── PWA Install Prompt ───────────────────────────────
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner(){
+  const banner = document.getElementById('installBanner');
+  if(banner) banner.style.display = 'flex';
+}
+
+function installApp(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(()=>{
+    deferredInstallPrompt = null;
+    document.getElementById('installBanner').style.display = 'none';
+  });
+}
+
+function dismissInstall(){
+  document.getElementById('installBanner').style.display = 'none';
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').style.display = 'none';
+  showStatus('✅ App installed! Find "Sanken Booking" on your home screen.','ok');
+  setTimeout(hideStatus, 4000);
+});
+
+// ─── Service Worker ───────────────────────────────────
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE = 'sanken-booking-v1';
+    const ASSETS = ['/sanken-booking/'];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+      ));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      if(e.request.method !== 'GET') return;
+      e.respondWith(
+        fetch(e.request).catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
 </script>
+<!-- PWA Install Banner -->
+<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:500;
+  background:linear-gradient(135deg,#1e2d4a,#192038);
+  border:1px solid rgba(245,197,66,.4);border-radius:16px;
+  padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.5);
+  align-items:center;gap:14px;max-width:360px;width:calc(100% - 32px);
+  animation:slideUp .3s ease;">
+  <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f5c542,#e8a820);
+    display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#000;flex-shrink:0;">S</div>
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:.82rem;font-weight:700;color:#f0f2f8;">Add to Home Screen</div>
+    <div style="font-size:.72rem;color:#7b8ab8;margin-top:2px;">Install Sanken Booking as an app</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="dismissInstall()" style="background:transparent;border:1px solid #2d3650;color:#7b8ab8;
+      padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.75rem;font-family:'Plus Jakarta Sans',sans-serif;">Later</button>
+    <button onclick="installApp()" style="background:linear-gradient(135deg,#f5c542,#e8a820);border:none;color:#000;
+      padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">Install</button>
+  </div>
+</div>
+
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
 </body>
 </html>
