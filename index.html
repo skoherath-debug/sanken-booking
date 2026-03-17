@@ -33,7 +33,7 @@
   --bg:#0f1117;--bg2:#161b27;--card:#1c2333;--card2:#222940;
   --border:#2d3650;--border2:#3a4566;
   --gold:#f5c542;--gold2:#e8a820;
-  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;--purple:#a855f7;
   --text:#f0f2f8;--muted:#7b8ab8;--muted2:#4a5580;
   --font:'Plus Jakarta Sans',sans-serif;
 }
@@ -50,8 +50,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
              radial-gradient(ellipse at 80% 20%,rgba(59,130,246,.09) 0%,transparent 55%);
 }
 .hero::after{
-  content:'';position:absolute;right:-80px;top:-80px;
-  width:320px;height:320px;border-radius:50%;
+  content:'';position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;
   background:radial-gradient(circle,rgba(245,197,66,.07),transparent 70%);
 }
 .hero-inner{
@@ -69,7 +68,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 }
 .brand-text h1{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;letter-spacing:-.3px;}
 .brand-text p{font-size:.75rem;color:var(--muted);margin-top:3px;font-weight:500;}
-.brand-text .live-dot{
+.live-dot{
   display:inline-flex;align-items:center;gap:5px;
   font-size:.68rem;color:var(--green);font-weight:600;margin-top:4px;
 }
@@ -107,22 +106,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 /* STATUS */
 #statusBar{max-width:900px;margin:0 auto;padding:0 24px;height:0;overflow:hidden;transition:height .3s;}
 #statusBar.show{height:46px;padding-top:10px;}
-.status-inner{
-  padding:9px 16px;border-radius:9px;font-size:.8rem;font-weight:600;
-  display:flex;align-items:center;gap:8px;
-}
+.status-inner{padding:9px 16px;border-radius:9px;font-size:.8rem;font-weight:600;display:flex;align-items:center;gap:8px;}
 .status-inner.ok  {background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green);}
 .status-inner.err {background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);}
 .status-inner.info{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:var(--blue);}
 
 /* DATE STRIP */
-.date-strip{
-  max-width:900px;margin:24px auto 0;padding:0 24px;
-  display:flex;align-items:center;gap:10px;
-}
+.date-strip{max-width:900px;margin:24px auto 0;padding:0 24px;display:flex;align-items:center;gap:10px;}
 .nav-btn{
-  width:38px;height:38px;border-radius:10px;
-  background:var(--card);border:1px solid var(--border);
+  width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--border);
   color:var(--text);font-size:1.1rem;cursor:pointer;
   display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
 }
@@ -149,16 +141,51 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .stat-card{
   background:var(--card);border:1px solid var(--border);
   border-radius:14px;padding:16px;
-  display:flex;align-items:center;gap:12px;
-  transition:border-color .2s;
+  display:flex;align-items:center;gap:12px;transition:border-color .2s;
 }
 .stat-card:hover{border-color:var(--border2);}
 .stat-icon{font-size:1.5rem;}
 .stat-label{font-size:.7rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
 .stat-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-top:2px;}
 
+/* SELECTION TOOLBAR */
+.select-toolbar{
+  max-width:900px;margin:16px auto 0;padding:0 24px;
+  display:none;
+}
+.select-toolbar.visible{display:block;}
+.toolbar-inner{
+  background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(59,130,246,.12));
+  border:1px solid rgba(168,85,247,.35);
+  border-radius:14px;padding:14px 18px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.toolbar-inner .sel-info{flex:1;min-width:0;}
+.sel-title{font-size:.88rem;font-weight:700;color:var(--purple);}
+.sel-detail{font-size:.75rem;color:var(--muted);margin-top:2px;}
+.toolbar-btns{display:flex;gap:8px;}
+.tbtn{
+  font-size:.78rem;font-weight:700;padding:8px 16px;border-radius:8px;
+  border:none;cursor:pointer;font-family:var(--font);transition:all .15s;
+}
+.tbtn-confirm{background:var(--gold);color:#000;}
+.tbtn-confirm:hover{background:var(--gold2);}
+.tbtn-clear{background:rgba(239,68,68,.14);color:var(--red);border:1px solid rgba(239,68,68,.28)!important;}
+.tbtn-clear:hover{background:rgba(239,68,68,.26);}
+
+/* HINT BAR */
+.hint-bar{
+  max-width:900px;margin:10px auto 0;padding:0 24px;
+}
+.hint-inner{
+  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);
+  border-radius:10px;padding:9px 14px;
+  font-size:.76rem;color:var(--muted);
+  display:flex;align-items:center;gap:8px;
+}
+
 /* MAIN */
-.main-wrap{max-width:900px;margin:20px auto 40px;padding:0 24px;}
+.main-wrap{max-width:900px;margin:16px auto 40px;padding:0 24px;}
 .room-card{background:var(--card);border:1px solid var(--border);border-radius:22px;overflow:hidden;}
 .room-header{
   padding:22px 24px;
@@ -175,16 +202,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .room-title h2{font-size:1.05rem;font-weight:800;}
 .room-title p{font-size:.73rem;color:var(--muted);margin-top:3px;}
 .room-badges{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
-.badge{
-  font-size:.7rem;font-weight:700;padding:5px 11px;border-radius:20px;
-  border:1px solid;white-space:nowrap;
-}
+.badge{font-size:.7rem;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid;white-space:nowrap;}
 .badge-cap  {background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:var(--blue);}
 .badge-avail{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
 .badge-busy {background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--red);}
 
 /* SLOTS */
-.slots-wrap{padding:18px 18px 18px;}
+.slots-wrap{padding:18px;}
 .slots-grid{display:flex;flex-direction:column;gap:7px;max-height:540px;overflow-y:auto;padding-right:4px;}
 .slots-grid::-webkit-scrollbar{width:4px;}
 .slots-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
@@ -193,37 +217,55 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   display:flex;align-items:center;gap:12px;
   padding:12px 15px;border-radius:12px;
   border:1px solid var(--border);background:var(--bg2);
-  transition:all .18s;
+  transition:all .18s;position:relative;
 }
 .slot.available{cursor:pointer;}
 .slot.available:hover{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateX(4px);}
 .slot.booked{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.18);}
 .slot.mine  {background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);}
+.slot.pending-cancel{background:rgba(245,197,66,.06)!important;border-color:rgba(245,197,66,.35)!important;}
+.slot.pending-cancel .slot-dot{background:var(--gold)!important;box-shadow:0 0 6px rgba(245,197,66,.5)!important;}
+
+/* SELECTED STATE */
+.slot.selected{
+  border-color:var(--purple)!important;
+  background:rgba(168,85,247,.08)!important;
+  transform:translateX(4px);
+}
+.slot.selected .slot-dot{background:var(--purple)!important;box-shadow:0 0 8px rgba(168,85,247,.6)!important;}
+.slot.sel-first{border-radius:12px 12px 4px 4px!important;}
+.slot.sel-middle{border-radius:4px!important;margin-top:-3px;margin-bottom:-3px;}
+.slot.sel-last{border-radius:4px 4px 12px 12px!important;}
+.slot.sel-first.sel-last{border-radius:12px!important;margin:0!important;}
+
+.sel-check{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;border-radius:6px;
+  background:var(--purple);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.7rem;color:#fff;font-weight:800;
+  box-shadow:0 2px 8px rgba(168,85,247,.5);
+}
 
 .slot-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .slot.available .slot-dot{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5);}
 .slot.booked    .slot-dot{background:var(--red);}
 .slot.mine      .slot-dot{background:var(--green);}
 
-.slot-time{
-  font-size:.78rem;font-weight:700;min-width:98px;
-  color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;
-}
+.slot-time{font-size:.78rem;font-weight:700;min-width:98px;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;}
 .slot-info{flex:1;min-width:0;}
 .slot-who{font-size:.84rem;font-weight:700;}
 .slot-tags{display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap;}
-.dept-badge{
-  font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;
-  background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--blue);
-}
+.dept-badge{font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--blue);}
 .slot-why{font-size:.73rem;color:var(--muted);}
 .slot-free{font-size:.8rem;color:var(--muted2);}
+.slot-duration{font-size:.7rem;color:var(--purple);font-weight:600;margin-top:2px;}
 
 .slot-actions{display:flex;gap:6px;flex-shrink:0;}
 .sbtn{
   font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:7px;
-  border:none;cursor:pointer;font-family:var(--font);
-  transition:all .15s;text-transform:uppercase;letter-spacing:.04em;
+  border:none;cursor:pointer;font-family:var(--font);transition:all .15s;
+  text-transform:uppercase;letter-spacing:.04em;
 }
 .sbtn-book  {background:var(--gold);color:#000;}
 .sbtn-book:hover{background:var(--gold2);}
@@ -231,6 +273,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .sbtn-cancel:hover{background:rgba(239,68,68,.26);}
 .sbtn-edit  {background:rgba(59,130,246,.14);color:var(--blue);border:1px solid rgba(59,130,246,.28)!important;}
 .sbtn-edit:hover{background:rgba(59,130,246,.26);}
+.sbtn-pending{background:rgba(245,197,66,.12);color:var(--gold);border:1px solid rgba(245,197,66,.3)!important;opacity:.8;cursor:default!important;}
 
 /* OVERLAYS */
 .overlay{
@@ -239,7 +282,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   z-index:300;align-items:center;justify-content:center;padding:16px;
 }
 .overlay.open{display:flex;}
-
 .modal{
   background:var(--card);border:1px solid var(--border2);
   border-radius:24px;padding:32px;width:100%;max-width:440px;
@@ -247,19 +289,22 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   animation:pop .22s cubic-bezier(.34,1.56,.64,1);
 }
 @keyframes pop{from{opacity:0;transform:scale(.9) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
-
 .modal-badge{
   font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
   padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;
 }
 .modal h3{font-size:1.3rem;font-weight:800;margin-bottom:4px;}
-.modal .modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
+.modal .modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:10px;}
+.duration-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
+.dpill{
+  font-size:.72rem;font-weight:700;padding:5px 12px;border-radius:20px;
+  border:1px solid var(--border2);color:var(--muted);cursor:pointer;
+  background:var(--bg2);transition:all .15s;
+}
+.dpill.active,.dpill:hover{background:var(--purple);color:#fff;border-color:var(--purple);}
 
 .fgroup{margin-bottom:15px;}
-.fgroup label{
-  display:block;font-size:.7rem;font-weight:700;
-  text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;
-}
+.fgroup label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
 .fgroup input,.fgroup select{
   width:100%;background:var(--bg2);border:1px solid var(--border2);
   color:var(--text);padding:12px 14px;border-radius:11px;
@@ -267,6 +312,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 }
 .fgroup input:focus,.fgroup select:focus{border-color:var(--gold);}
 .fgroup select option{background:var(--card);}
+
+.booking-summary{
+  background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);
+  border-radius:10px;padding:12px 14px;margin-bottom:16px;
+  font-size:.8rem;color:var(--muted);
+}
+.booking-summary strong{color:var(--purple);display:block;font-size:.85rem;margin-bottom:3px;}
 
 .modal-btns{display:flex;gap:10px;margin-top:22px;}
 .mbtn-primary{
@@ -276,29 +328,25 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 }
 .mbtn-primary:hover{opacity:.88;}
 .mbtn-secondary{
-  flex:1;background:transparent;color:var(--muted);
-  border:1px solid var(--border2);padding:13px;border-radius:11px;
-  font-weight:500;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:all .15s;
+  flex:1;background:transparent;color:var(--muted);border:1px solid var(--border2);
+  padding:13px;border-radius:11px;font-weight:500;font-size:.88rem;
+  cursor:pointer;font-family:var(--font);transition:all .15s;
 }
 .mbtn-secondary:hover{color:var(--text);border-color:var(--border2);}
 
-/* ADMIN PANEL */
+/* ADMIN */
 .admin-overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.82);backdrop-filter:blur(10px);
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);
   z-index:400;align-items:center;justify-content:center;padding:16px;
 }
 .admin-overlay.open{display:flex;}
 .admin-modal{
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:24px;padding:30px;width:100%;max-width:580px;
-  max-height:88vh;overflow-y:auto;
-  box-shadow:0 40px 100px rgba(0,0,0,.6);
-  animation:pop .22s cubic-bezier(.34,1.56,.64,1);
+  background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:30px;
+  width:100%;max-width:580px;max-height:88vh;overflow-y:auto;
+  box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .22s cubic-bezier(.34,1.56,.64,1);
 }
 .admin-modal::-webkit-scrollbar{width:4px;}
 .admin-modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-
 .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
 .admin-header h2{font-size:1.15rem;font-weight:800;}
 .admin-close-btn{
@@ -307,41 +355,28 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;
 }
 .admin-date-info{font-size:.78rem;color:var(--muted);margin-bottom:18px;}
-
 .abi{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:13px;padding:14px 16px;margin-bottom:9px;
-  display:flex;align-items:flex-start;gap:12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:13px;
+  padding:14px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px;
 }
 .abi-info{flex:1;min-width:0;}
 .abi-name{font-weight:700;font-size:.88rem;}
-.abi-dept{
-  font-size:.68rem;background:rgba(59,130,246,.12);
-  border:1px solid rgba(59,130,246,.2);color:var(--blue);
-  display:inline-block;padding:2px 8px;border-radius:20px;margin-top:4px;
-}
+.abi-dept{font-size:.68rem;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);color:var(--blue);display:inline-block;padding:2px 8px;border-radius:20px;margin-top:4px;}
 .abi-meta{font-size:.74rem;color:var(--muted);margin-top:4px;}
+.abi-duration{font-size:.7rem;color:var(--purple);font-weight:600;margin-top:2px;}
 .abi-actions{display:flex;gap:6px;flex-shrink:0;margin-top:2px;}
 .no-bookings{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;}
-
 .admin-login-wrap{text-align:center;}
 .admin-login-wrap .lock{font-size:3rem;margin-bottom:12px;}
 .admin-login-wrap h3{font-size:1.1rem;font-weight:800;margin-bottom:6px;}
 .admin-login-wrap p{font-size:.82rem;color:var(--muted);margin-bottom:22px;}
 
 /* LEGEND */
-.legend{
-  max-width:900px;margin:0 auto 32px;padding:0 24px;
-  display:flex;gap:22px;flex-wrap:wrap;
-}
+.legend{max-width:900px;margin:0 auto 32px;padding:0 24px;display:flex;gap:20px;flex-wrap:wrap;}
 .leg-item{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);}
 .leg-dot{width:8px;height:8px;border-radius:50%;}
 
-/* FOOTER */
-.footer{
-  text-align:center;padding:22px;font-size:.72rem;
-  color:var(--muted2);border-top:1px solid var(--border);
-}
+.footer{text-align:center;padding:22px;font-size:.72rem;color:var(--muted2);border-top:1px solid var(--border);}
 
 @media(max-width:520px){
   .hero-inner{padding:20px 16px;}
@@ -349,8 +384,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   .stats-row{gap:8px;}
   .stat-card{padding:12px 10px;gap:8px;}
   .stat-val{font-size:1.2rem;}
-  .main-wrap,.date-strip,.stats-row,.legend{padding:0 14px;}
-  .main-wrap{margin-top:16px;}
+  .main-wrap,.date-strip,.stats-row,.legend,.select-toolbar,.hint-bar{padding:0 14px;}
   .slot-time{min-width:80px;}
   .dept-badge{display:none;}
 }
@@ -409,6 +443,27 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   </div>
 </div>
 
+<!-- HINT BAR -->
+<div class="hint-bar">
+  <div class="hint-inner">
+    💡 <span>Tap a slot to select it. Tap multiple <strong>consecutive</strong> available slots to book a longer session, then click <strong>Book Selected</strong>.</span>
+  </div>
+</div>
+
+<!-- SELECTION TOOLBAR -->
+<div class="select-toolbar" id="selectToolbar">
+  <div class="toolbar-inner">
+    <div class="sel-info">
+      <div class="sel-title" id="selTitle">0 slots selected</div>
+      <div class="sel-detail" id="selDetail">Select consecutive available slots</div>
+    </div>
+    <div class="toolbar-btns">
+      <button class="tbtn tbtn-clear" onclick="clearSelection()">✕ Clear</button>
+      <button class="tbtn tbtn-confirm" onclick="openBookFromSelection()">📅 Book Selected</button>
+    </div>
+  </div>
+</div>
+
 <!-- ROOM CARD -->
 <div class="main-wrap">
   <div class="room-card">
@@ -432,7 +487,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 <!-- LEGEND -->
 <div class="legend">
   <div class="leg-item"><div class="leg-dot" style="background:var(--green);box-shadow:0 0 5px rgba(34,197,94,.5)"></div>Available</div>
-  <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Booked by others</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--purple)"></div>Selected</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Booked</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--gold)"></div>Cancel Pending</div>
   <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Your booking</div>
 </div>
 
@@ -441,9 +498,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 <!-- BOOK MODAL -->
 <div class="overlay" id="bookOverlay">
   <div class="modal">
-    <div class="modal-badge" style="background:rgba(245,197,66,.15);color:var(--gold);border:1px solid rgba(245,197,66,.3)">🏛️ Boardroom</div>
+    <div class="modal-badge" style="background:rgba(168,85,247,.15);color:var(--purple);border:1px solid rgba(168,85,247,.3)">🏛️ Boardroom Booking</div>
     <h3 id="bookTitle">Book Slot</h3>
     <div class="modal-sub" id="bookSub"></div>
+    <div class="booking-summary" id="bookingSummary"></div>
     <div class="fgroup">
       <label>Your Full Name</label>
       <input type="text" id="bName" placeholder="e.g. Kasun Perera" maxlength="40">
@@ -517,12 +575,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 <!-- ADMIN OVERLAY -->
 <div class="admin-overlay" id="adminOverlay">
   <div class="admin-modal">
-
-    <!-- Login -->
     <div id="adminLoginWrap" class="admin-login-wrap">
       <div class="lock">🔐</div>
       <h3>Admin Access</h3>
-      <p>Enter the administrator password to manage all bookings on any date.</p>
+      <p>Enter the administrator password to manage all bookings.</p>
       <div class="fgroup">
         <label>Password</label>
         <input type="password" id="adminPassInput" placeholder="Enter password…"
@@ -533,8 +589,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
         <button class="mbtn-primary" onclick="verifyAdmin()">🔓 Login</button>
       </div>
     </div>
-
-    <!-- Panel -->
     <div id="adminPanelWrap" style="display:none">
       <div class="admin-header">
         <h2>⚙️ Admin — All Bookings</h2>
@@ -543,15 +597,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
       <div class="admin-date-info" id="adminDateInfo"></div>
       <div id="adminList"></div>
     </div>
-
   </div>
 </div>
 
 <script>
 // ─── Config ───────────────────────────────────────────
-const ADMIN_PASSWORD = 'sanken2024'; // ← change this to your own password
+const ADMIN_PASSWORD = 'sanken2024'; // ← change this!
 
-// 30-min slots 08:00–18:00
 const SLOTS = [];
 for(let h=8;h<18;h++){
   SLOTS.push(`${String(h).padStart(2,'0')}:00`);
@@ -559,9 +611,15 @@ for(let h=8;h<18;h++){
 }
 
 // ─── State ────────────────────────────────────────────
-let currentDate = today();
-let userName = '', bookings = {}, firebaseOK = false, isAdmin = false;
-let pendingSlot = null, editKey = null;
+let currentDate  = today();
+let userName     = '';
+let bookings     = {};
+let firebaseOK   = false;
+let isAdmin      = false;
+let selectedSlots= []; // array of time strings e.g. ['09:00','09:30','10:00']
+let pendingSlots = []; // slots about to be booked
+let editKey      = null;
+let unsub        = null;
 
 // ─── Utils ────────────────────────────────────────────
 function today(){ const d=new Date();d.setHours(0,0,0,0);return d; }
@@ -570,6 +628,14 @@ function slotKey(time){ return `room1__${dateKey(currentDate)}__${time.replace('
 function nextTime(t){ const[h,m]=t.split(':').map(Number);const tot=h*60+m+30;return `${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`; }
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 function isToday(d){ return d.getTime()===today().getTime(); }
+function slotIndex(t){ return SLOTS.indexOf(t); }
+
+function durationLabel(slots){
+  const mins = slots.length * 30;
+  if(mins < 60) return `${mins} min`;
+  const h=Math.floor(mins/60), m=mins%60;
+  return m ? `${h}h ${m}min` : `${h} hour${h>1?'s':''}`;
+}
 
 // ─── Firebase ─────────────────────────────────────────
 window.addEventListener('firebase-ready',()=>{
@@ -580,7 +646,6 @@ window.addEventListener('firebase-ready',()=>{
   setTimeout(hideStatus,3500);
 });
 
-let unsub=null;
 function subscribeDate(){
   if(!firebaseOK)return;
   const{db,ref,onValue}=window._fb;
@@ -592,22 +657,14 @@ function subscribeDate(){
 }
 
 async function fbSet(key,data){
-  if(!firebaseOK){
-    const b=JSON.parse(localStorage.getItem('mb')||'{}');
-    b[key]=data;localStorage.setItem('mb',JSON.stringify(b));
-    bookings=b;render();return;
-  }
+  if(!firebaseOK){const b=JSON.parse(localStorage.getItem('mb')||'{}');b[key]=data;localStorage.setItem('mb',JSON.stringify(b));bookings=b;render();return;}
   const{db,ref,set}=window._fb;
   const[,date]=key.split('__');
   await set(ref(db,`bookings/${date}/${key}`),data);
 }
 
 async function fbRemove(key){
-  if(!firebaseOK){
-    const b=JSON.parse(localStorage.getItem('mb')||'{}');
-    delete b[key];localStorage.setItem('mb',JSON.stringify(b));
-    bookings=b;render();return;
-  }
+  if(!firebaseOK){const b=JSON.parse(localStorage.getItem('mb')||'{}');delete b[key];localStorage.setItem('mb',JSON.stringify(b));bookings=b;render();return;}
   const{db,ref,remove}=window._fb;
   const[,date]=key.split('__');
   await remove(ref(db,`bookings/${date}/${key}`));
@@ -615,7 +672,6 @@ async function fbRemove(key){
 
 // ─── Render ───────────────────────────────────────────
 function render(){
-  // Date header
   const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
   document.getElementById('dateMain').innerHTML=
     currentDate.toLocaleDateString('en-US',opts)+
@@ -623,13 +679,23 @@ function render(){
   document.getElementById('dateSub').textContent=
     isToday(currentDate)?'Showing live availability for today':'Showing availability for selected date';
 
-  // Stats
-  const booked=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`)).length;
+  const bookedKeys=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`));
+  const booked=bookedKeys.length;
   const avail=SLOTS.length-booked;
+  const pendingCount=bookedKeys.filter(k=>bookings[k]&&bookings[k].cancelRequested).length;
   document.getElementById('statAvail').textContent=avail;
   document.getElementById('statBooked').textContent=booked;
-
-  // Badge
+  // Show pending badge on admin button if any
+  const adminBtn=document.getElementById('adminToggle');
+  if(pendingCount>0&&isAdmin){
+    adminBtn.textContent=`⚙️ Admin (${pendingCount} ⚠️)`;
+  } else if(pendingCount>0){
+    adminBtn.textContent=`⚙️ Admin ⚠️`;
+    adminBtn.style.borderColor='var(--gold)';adminBtn.style.color='var(--gold)';
+  } else {
+    adminBtn.textContent='⚙️ Admin';
+    adminBtn.style.borderColor='';adminBtn.style.color='';
+  }
   const badge=document.getElementById('availBadge');
   badge.textContent=`${avail} Available`;
   badge.className='badge '+(avail>0?'badge-avail':'badge-busy');
@@ -637,70 +703,144 @@ function render(){
   // Slots
   const list=document.getElementById('slotsList');
   list.innerHTML='';
-  SLOTS.forEach(time=>{
+  SLOTS.forEach((time,idx)=>{
     const key=slotKey(time);
     const end=nextTime(time);
     const bk=bookings[key];
     const mine=bk&&bk.name===userName&&userName.trim()!=='';
-    const cls=bk?(mine?'mine':'booked'):'available';
+    const isSelected=selectedSlots.includes(time);
+    let cls=bk?(mine?'mine':'booked'):'available';
+    if(bk&&bk.cancelRequested) cls='mine pending-cancel';
+    if(isSelected) cls+=' selected';
+
+    // selection position styling
+    if(isSelected){
+      const first=selectedSlots[0]===time;
+      const last=selectedSlots[selectedSlots.length-1]===time;
+      if(selectedSlots.length===1) cls+=' sel-first sel-last';
+      else if(first) cls+=' sel-first';
+      else if(last) cls+=' sel-last';
+      else cls+=' sel-middle';
+    }
 
     const div=document.createElement('div');
     div.className=`slot ${cls}`;
+    if(!bk) div.onclick=()=>toggleSlot(time);
 
     let info='',actions='';
     if(bk){
+      const dur=bk.slots?durationLabel(bk.slots):'30 min';
       info=`<div class="slot-info">
         <div class="slot-who">${esc(bk.name)}</div>
         <div class="slot-tags">
           ${bk.dept?`<span class="dept-badge">${esc(bk.dept)}</span>`:''}
           <span class="slot-why">${esc(bk.purpose)}</span>
         </div>
+        <div class="slot-duration">⏱ ${dur}${bk.cancelRequested?` &nbsp;<span style="color:var(--gold);font-size:.68rem;font-weight:700;">⚠️ Cancel Requested</span>`:''}</div>
       </div>`;
-      if(mine) actions+=`<button class="sbtn sbtn-cancel" onclick="cancelSlot('${key}')">Cancel</button>`;
+      if(mine){
+        if(bk.cancelRequested){
+          actions+=`<button class="sbtn sbtn-pending" onclick="event.stopPropagation();" disabled>⏳ Pending…</button>`;
+        } else {
+          actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();requestCancel('${key}')">Request Cancel</button>`;
+        }
+      }
       if(isAdmin){
-        actions+=`<button class="sbtn sbtn-edit" onclick="openEdit('${key}')">Edit</button>`;
-        actions+=`<button class="sbtn sbtn-cancel" onclick="adminDel('${key}')">Del</button>`;
+        actions+=`<button class="sbtn sbtn-edit" onclick="event.stopPropagation();openEdit('${key}')">Edit</button>`;
+        actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();adminDel('${key}')">Del</button>`;
       }
     } else {
-      info=`<div class="slot-info"><span class="slot-free">Available — tap to book</span></div>`;
-      actions=`<button class="sbtn sbtn-book" onclick="openBook('${time}','${end}')">Book</button>`;
+      if(isSelected){
+        info=`<div class="slot-info"><span style="font-size:.8rem;color:var(--purple);font-weight:600;">Selected ✓</span></div>`;
+      } else {
+        info=`<div class="slot-info"><span class="slot-free">Tap to select</span></div>`;
+      }
     }
+
+    const checkEl=isSelected?`<div class="sel-check">${selectedSlots.indexOf(time)+1}</div>`:'';
 
     div.innerHTML=`
       <div class="slot-dot"></div>
       <div class="slot-time">${time} – ${end}</div>
       ${info}
-      <div class="slot-actions">${actions}</div>`;
+      <div class="slot-actions">${actions}</div>
+      ${checkEl}`;
     list.appendChild(div);
   });
+
+  updateToolbar();
 }
 
-// ─── Date nav ─────────────────────────────────────────
-function changeDay(n){
-  currentDate=new Date(currentDate);
-  currentDate.setDate(currentDate.getDate()+n);
-  subscribeDate();
-  if(!firebaseOK)render();
-}
-function goToday(){currentDate=today();subscribeDate();if(!firebaseOK)render();}
-
-// ─── Book modal ───────────────────────────────────────
-function openBook(time,end){
+// ─── Multi-slot selection ─────────────────────────────
+function toggleSlot(time){
   if(!userName.trim()){
     showStatus('Please enter your name at the top first','err');
-    document.getElementById('userInput').focus(); return;
+    document.getElementById('userInput').focus();return;
   }
-  pendingSlot=time;
-  document.getElementById('bookTitle').textContent=`${time} – ${end}`;
+  const key=slotKey(time);
+  if(bookings[key]) return; // already booked
+
+  if(selectedSlots.includes(time)){
+    // deselect — remove this and everything after
+    const idx=selectedSlots.indexOf(time);
+    selectedSlots=selectedSlots.slice(0,idx);
+  } else {
+    if(selectedSlots.length===0){
+      selectedSlots=[time];
+    } else {
+      // must be consecutive to last selected
+      const lastTime=selectedSlots[selectedSlots.length-1];
+      const lastIdx=slotIndex(lastTime);
+      const thisIdx=slotIndex(time);
+      if(thisIdx===lastIdx+1){
+        // check no booked slots in between
+        selectedSlots.push(time);
+      } else {
+        // start fresh selection
+        selectedSlots=[time];
+        showStatus('Started new selection — slots must be consecutive','info');
+        setTimeout(hideStatus,2500);
+      }
+    }
+  }
+  render();
+}
+
+function updateToolbar(){
+  const toolbar=document.getElementById('selectToolbar');
+  if(selectedSlots.length===0){toolbar.classList.remove('visible');return;}
+  toolbar.classList.add('visible');
+  const first=selectedSlots[0];
+  const last=selectedSlots[selectedSlots.length-1];
+  const endTime=nextTime(last);
+  document.getElementById('selTitle').textContent=
+    `${selectedSlots.length} slot${selectedSlots.length>1?'s':''} selected — ${durationLabel(selectedSlots)}`;
+  document.getElementById('selDetail').textContent=
+    `${first} – ${endTime} · Click "Book Selected" to confirm`;
+}
+
+function clearSelection(){selectedSlots=[];render();}
+
+function openBookFromSelection(){
+  if(selectedSlots.length===0)return;
+  pendingSlots=[...selectedSlots];
+  const first=pendingSlots[0];
+  const last=pendingSlots[pendingSlots.length-1];
+  const endTime=nextTime(last);
+  document.getElementById('bookTitle').textContent=`${first} – ${endTime}`;
   document.getElementById('bookSub').textContent=
     currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('bookingSummary').innerHTML=
+    `<strong>📅 ${durationLabel(pendingSlots)} booking</strong>
+     ${pendingSlots.length} slot${pendingSlots.length>1?'s':''}: ${first} → ${endTime}`;
   document.getElementById('bName').value=userName;
   document.getElementById('bDept').value='';
   document.getElementById('bPurpose').value='';
   document.getElementById('bookOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('bDept').focus(),120);
 }
-function closeBook(){document.getElementById('bookOverlay').classList.remove('open');pendingSlot=null;}
+
+function closeBook(){document.getElementById('bookOverlay').classList.remove('open');pendingSlots=[];}
 
 async function confirmBook(){
   const name=document.getElementById('bName').value.trim();
@@ -709,23 +849,41 @@ async function confirmBook(){
   if(!name){showStatus('Please enter your name','err');return;}
   if(!dept){showStatus('Please select your department','err');return;}
   if(!purpose){showStatus('Please enter the meeting purpose','err');return;}
-  const key=slotKey(pendingSlot);
-  if(bookings[key]){showStatus('Slot just got taken! Please choose another.','err');closeBook();return;}
+  if(pendingSlots.length===0){showStatus('No slots selected','err');return;}
+
+  // Check none got booked meanwhile
+  for(const t of pendingSlots){
+    if(bookings[slotKey(t)]){showStatus(`Slot ${t} was just taken! Clear and try again.`,'err');closeBook();clearSelection();return;}
+  }
+
   userName=name;
   document.getElementById('userInput').value=name;
   updateAvatar();
-  await fbSet(key,{name,dept,purpose,bookedAt:Date.now()});
+
+  const bookedAt=Date.now();
+  const groupId=`grp_${bookedAt}`;
+  for(const t of pendingSlots){
+    await fbSet(slotKey(t),{name,dept,purpose,bookedAt,slots:pendingSlots,groupId});
+  }
+
+  clearSelection();
   closeBook();
-  showStatus('✅ Boardroom booked successfully!','ok');
-  setTimeout(hideStatus,3500);
+  showStatus(`✅ Boardroom booked: ${durationLabel(pendingSlots)} (${pendingSlots.length} slot${pendingSlots.length>1?'s':''})!`,'ok');
+  setTimeout(hideStatus,4000);
 }
 
-// ─── Cancel ───────────────────────────────────────────
-async function cancelSlot(key){
-  if(!confirm('Cancel your booking for this slot?'))return;
-  await fbRemove(key);
-  showStatus('Booking cancelled','info');
-  setTimeout(hideStatus,2500);
+// ─── Request Cancel (user → pending admin approval) ───
+async function requestCancel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  const dur=durationLabel(slots);
+  if(!confirm(`Request cancellation of your ${dur} booking?\n\nAn admin will review and approve it.`))return;
+  for(const t of slots){
+    const k=slotKey(t);
+    if(bookings[k]) await fbSet(k,{...bookings[k],cancelRequested:true,cancelRequestedAt:Date.now()});
+  }
+  showStatus('⏳ Cancellation request sent — awaiting admin approval','info');
+  setTimeout(hideStatus,4000);
 }
 
 // ─── Edit modal ───────────────────────────────────────
@@ -733,8 +891,9 @@ function openEdit(key){
   const bk=bookings[key];if(!bk)return;
   editKey=key;
   const tp=key.split('__')[2].replace('h',':');
-  document.getElementById('editTitle').textContent=`${tp} – ${nextTime(tp)}`;
-  document.getElementById('editSub').textContent=`Editing booking by ${bk.name}`;
+  const slots=bk.slots||[tp];
+  document.getElementById('editTitle').textContent=`${slots[0]} – ${nextTime(slots[slots.length-1])}`;
+  document.getElementById('editSub').textContent=`Editing ${durationLabel(slots)} booking by ${bk.name}`;
   document.getElementById('eName').value=bk.name||'';
   document.getElementById('eDept').value=bk.dept||'';
   document.getElementById('ePurpose').value=bk.purpose||'';
@@ -748,13 +907,59 @@ async function confirmEdit(){
   const purpose=document.getElementById('ePurpose').value.trim();
   if(!name||!purpose){showStatus('Name and purpose are required','err');return;}
   const ex=bookings[editKey];
-  await fbSet(editKey,{...ex,name,dept,purpose});
+  const slots=ex.slots||[editKey.split('__')[2].replace('h',':')];
+  for(const t of slots){
+    const k=slotKey(t);
+    if(bookings[k]) await fbSet(k,{...bookings[k],name,dept,purpose});
+  }
   closeEdit();
-  showStatus('✅ Booking updated successfully','ok');
+  showStatus('✅ Booking updated','ok');
   setTimeout(hideStatus,2500);
 }
 
-// ─── Admin ────────────────────────────────────────────
+// ─── Admin approve/reject cancel ──────────────────────
+async function approveCancel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  if(!confirm(`Approve cancellation for ${bk.name} (${durationLabel(slots)})?`))return;
+  for(const t of slots){await fbRemove(slotKey(t));}
+  renderAdminPanel();
+  render();
+  showStatus(`✅ Cancellation approved — slot freed`,'ok');
+  setTimeout(hideStatus,3000);
+}
+
+async function rejectCancel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  if(!confirm(`Reject cancellation request for ${bk.name}?\nBooking will remain active.`))return;
+  for(const t of slots){
+    const k=slotKey(t);
+    if(bookings[k]){
+      const updated={...bookings[k]};
+      delete updated.cancelRequested;
+      delete updated.cancelRequestedAt;
+      await fbSet(k,updated);
+    }
+  }
+  renderAdminPanel();
+  render();
+  showStatus(`Cancellation request rejected — booking remains active`,'info');
+  setTimeout(hideStatus,3000);
+}
+
+// ─── Admin del ────────────────────────────────────────
+async function adminDel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  if(!confirm(`Delete this ${durationLabel(slots)} booking?`))return;
+  for(const t of slots){await fbRemove(slotKey(t));}
+  renderAdminPanel();
+  showStatus('Booking deleted','info');
+  setTimeout(hideStatus,2500);
+}
+
+// ─── Admin panel ──────────────────────────────────────
 function openAdminLogin(){
   if(isAdmin){renderAdminPanel();document.getElementById('adminOverlay').classList.add('open');return;}
   document.getElementById('adminLoginWrap').style.display='block';
@@ -771,8 +976,7 @@ function verifyAdmin(){
     document.getElementById('adminToggle').classList.add('active');
     document.getElementById('adminLoginWrap').style.display='none';
     document.getElementById('adminPanelWrap').style.display='block';
-    renderAdminPanel();
-    render();
+    renderAdminPanel();render();
   } else {
     showStatus('Incorrect password','err');
     document.getElementById('adminPassInput').value='';
@@ -782,21 +986,74 @@ function verifyAdmin(){
 function renderAdminPanel(){
   const ds=currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
   document.getElementById('adminDateInfo').textContent=`Showing bookings for: ${ds}`;
-  const list=document.getElementById('adminList');
-  list.innerHTML='';
+  const list=document.getElementById('adminList');list.innerHTML='';
+  const seen=new Set();
   const keys=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`)).sort();
-  if(!keys.length){list.innerHTML='<div class="no-bookings">📭 No bookings for this date</div>';return;}
+
+  // Separate pending cancellations from normal bookings
+  const pendingKeys=[], normalKeys=[];
   keys.forEach(key=>{
     const bk=bookings[key];
-    const tp=key.split('__')[2].replace('h',':');
-    const end=nextTime(tp);
+    const gid=bk.groupId||key;
+    if(seen.has(gid))return;
+    seen.add(gid);
+    if(bk.cancelRequested) pendingKeys.push(key);
+    else normalKeys.push(key);
+  });
+
+  // ── Pending Cancellation section ──
+  if(pendingKeys.length){
+    const header=document.createElement('div');
+    header.innerHTML=`<div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:10px;">⚠️ Pending Cancellation Requests (${pendingKeys.length})</div>`;
+    list.appendChild(header);
+    pendingKeys.forEach(key=>{
+      const bk=bookings[key];
+      const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+      const first=slots[0];const last=slots[slots.length-1];
+      const div=document.createElement('div');
+      div.className='abi';
+      div.style.borderColor='rgba(245,197,66,.4)';
+      div.style.background='rgba(245,197,66,.05)';
+      div.innerHTML=`
+        <div class="abi-info">
+          <div class="abi-name">${esc(bk.name)} <span style="color:var(--gold);font-size:.7rem;">— Cancel Requested</span></div>
+          ${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}
+          <div class="abi-meta">🕐 ${first} – ${nextTime(last)} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
+          <div class="abi-duration">⏱ ${durationLabel(slots)}</div>
+        </div>
+        <div class="abi-actions" style="flex-direction:column;gap:6px;">
+          <button class="sbtn" style="background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)!important;" onclick="approveCancel('${key}')">✅ Approve</button>
+          <button class="sbtn sbtn-edit" onclick="rejectCancel('${key}')">✕ Reject</button>
+        </div>`;
+      list.appendChild(div);
+    });
+    if(normalKeys.length){
+      const sep=document.createElement('div');
+      sep.style.cssText='border-top:1px solid var(--border);margin:14px 0 12px;';
+      list.appendChild(sep);
+      const h2=document.createElement('div');
+      h2.innerHTML=`<div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">📋 Active Bookings (${normalKeys.length})</div>`;
+      list.appendChild(h2);
+    }
+  }
+
+  if(!pendingKeys.length&&!normalKeys.length){
+    list.innerHTML='<div class="no-bookings">📭 No bookings for this date</div>';return;
+  }
+
+  // ── Normal bookings ──
+  normalKeys.forEach(key=>{
+    const bk=bookings[key];
+    const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+    const first=slots[0];const last=slots[slots.length-1];
     const div=document.createElement('div');
     div.className='abi';
     div.innerHTML=`
       <div class="abi-info">
         <div class="abi-name">${esc(bk.name)}</div>
         ${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}
-        <div class="abi-meta">🕐 ${tp} – ${end} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
+        <div class="abi-meta">🕐 ${first} – ${nextTime(last)} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
+        <div class="abi-duration">⏱ ${durationLabel(slots)}</div>
       </div>
       <div class="abi-actions">
         <button class="sbtn sbtn-edit" onclick="openEdit('${key}');closeAdmin()">Edit</button>
@@ -804,14 +1061,6 @@ function renderAdminPanel(){
       </div>`;
     list.appendChild(div);
   });
-}
-
-async function adminDel(key){
-  if(!confirm('Delete this booking as admin?'))return;
-  await fbRemove(key);
-  renderAdminPanel();
-  showStatus('Booking deleted','info');
-  setTimeout(hideStatus,2500);
 }
 
 // ─── User input ───────────────────────────────────────
@@ -822,11 +1071,19 @@ function updateAvatar(){
   document.getElementById('avatarEl').textContent=userName?userName[0].toUpperCase():'?';
 }
 
+// ─── Date nav ─────────────────────────────────────────
+function changeDay(n){
+  clearSelection();
+  currentDate=new Date(currentDate);
+  currentDate.setDate(currentDate.getDate()+n);
+  subscribeDate();if(!firebaseOK)render();
+}
+function goToday(){clearSelection();currentDate=today();subscribeDate();if(!firebaseOK)render();}
+
 // ─── Status ───────────────────────────────────────────
 function showStatus(msg,type){
   const bar=document.getElementById('statusBar'),inner=document.getElementById('statusInner');
-  inner.className=`status-inner ${type}`;inner.textContent=msg;
-  bar.classList.add('show');
+  inner.className=`status-inner ${type}`;inner.textContent=msg;bar.classList.add('show');
 }
 function hideStatus(){document.getElementById('statusBar').classList.remove('show');}
 
