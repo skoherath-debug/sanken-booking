@@ -3,16 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SankenOverseas – Room Booking</title>
+<title>SankenOverseas – Boardroom</title>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-  // ============================================================
-  //  🔧 PASTE YOUR FIREBASE CONFIG HERE (free — see README below)
-  // ============================================================
   const firebaseConfig = {
     apiKey:            "AIzaSyA4D0lxYO339x-9B1M_nOgYbZTNklOqTlM",
     authDomain:        "sanken-booking-df980.firebaseapp.com",
@@ -23,790 +18,831 @@
     appId:             "1:38788887699:web:eb7a6fde5c9e5a3bf48966",
     measurementId:     "G-Y0DXH9ZQ20"
   };
-  // ============================================================
-
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
-
-  // Expose helpers to window so inline JS can use them
   window._fb = { db, ref, set, remove, onValue };
   window.dispatchEvent(new Event("firebase-ready"));
 </script>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Epilogue:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
-/* ── Reset ──────────────────────────────────────────────── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0f1117;--bg2:#161b27;--card:#1c2333;--card2:#222940;
+  --border:#2d3650;--border2:#3a4566;
+  --gold:#f5c542;--gold2:#e8a820;
+  --green:#22c55e;--red:#ef4444;--blue:#3b82f6;
+  --text:#f0f2f8;--muted:#7b8ab8;--muted2:#4a5580;
+  --font:'Plus Jakarta Sans',sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;}
 
-/* ── Tokens ─────────────────────────────────────────────── */
-:root {
-  --bg:       #f5f2eb;
-  --surface:  #ffffff;
-  --ink:      #1a1814;
-  --muted:    #8a8679;
-  --border:   #dedad2;
-  --r1:       #c84b31;   /* room 1 accent */
-  --r2:       #2a6496;   /* room 2 accent */
-  --avail:    #3a7d44;
-  --mine:     #2a6496;
-  --taken:    #c84b31;
-  --yellow:   #e8b84b;
-  --radius:   14px;
-  --shadow:   0 2px 16px rgba(26,24,20,.08);
+/* HERO */
+.hero{
+  background:linear-gradient(135deg,#1a2340 0%,#0f1525 40%,#1a1a2e 100%);
+  border-bottom:1px solid var(--border);position:relative;overflow:hidden;
+}
+.hero::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 20% 50%,rgba(245,197,66,.13) 0%,transparent 60%),
+             radial-gradient(ellipse at 80% 20%,rgba(59,130,246,.09) 0%,transparent 55%);
+}
+.hero::after{
+  content:'';position:absolute;right:-80px;top:-80px;
+  width:320px;height:320px;border-radius:50%;
+  background:radial-gradient(circle,rgba(245,197,66,.07),transparent 70%);
+}
+.hero-inner{
+  position:relative;z-index:1;max-width:900px;margin:0 auto;
+  padding:30px 24px 26px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:16px;}
+.brand-logo{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.6rem;font-weight:800;color:#000;
+  box-shadow:0 6px 24px rgba(245,197,66,.4);flex-shrink:0;
+}
+.brand-text h1{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;letter-spacing:-.3px;}
+.brand-text p{font-size:.75rem;color:var(--muted);margin-top:3px;font-weight:500;}
+.brand-text .live-dot{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.68rem;color:var(--green);font-weight:600;margin-top:4px;
+}
+.live-dot::before{
+  content:'';width:6px;height:6px;border-radius:50%;
+  background:var(--green);animation:pulse 2s infinite;
+}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+.hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.user-pill{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.07);border:1px solid var(--border2);
+  border-radius:40px;padding:7px 16px 7px 7px;backdrop-filter:blur(8px);
+}
+.user-avatar{
+  width:32px;height:32px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;font-weight:800;font-size:.85rem;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.user-pill input{
+  background:transparent;border:none;color:var(--text);
+  font-family:var(--font);font-size:.85rem;outline:none;width:130px;
+}
+.user-pill input::placeholder{color:var(--muted);}
+.admin-btn{
+  background:rgba(245,197,66,.12);border:1px solid rgba(245,197,66,.3);
+  color:var(--gold);font-family:var(--font);font-size:.78rem;font-weight:700;
+  padding:9px 16px;border-radius:9px;cursor:pointer;transition:all .2s;
+}
+.admin-btn:hover{background:rgba(245,197,66,.22);border-color:var(--gold);}
+.admin-btn.active{background:var(--gold);color:#000;}
+
+/* STATUS */
+#statusBar{max-width:900px;margin:0 auto;padding:0 24px;height:0;overflow:hidden;transition:height .3s;}
+#statusBar.show{height:46px;padding-top:10px;}
+.status-inner{
+  padding:9px 16px;border-radius:9px;font-size:.8rem;font-weight:600;
+  display:flex;align-items:center;gap:8px;
+}
+.status-inner.ok  {background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--green);}
+.status-inner.err {background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);}
+.status-inner.info{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:var(--blue);}
+
+/* DATE STRIP */
+.date-strip{
+  max-width:900px;margin:24px auto 0;padding:0 24px;
+  display:flex;align-items:center;gap:10px;
+}
+.nav-btn{
+  width:38px;height:38px;border-radius:10px;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--text);font-size:1.1rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
+}
+.nav-btn:hover{background:var(--card2);border-color:var(--border2);}
+.date-info{flex:1;}
+.date-main{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.date-sub{font-size:.73rem;color:var(--muted);margin-top:2px;}
+.today-tag{
+  background:var(--gold);color:#000;font-size:.65rem;font-weight:800;
+  padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;
+}
+.today-btn{
+  background:transparent;border:1px solid var(--border);color:var(--muted);
+  font-family:var(--font);font-size:.78rem;font-weight:600;
+  padding:0 14px;height:38px;border-radius:9px;cursor:pointer;transition:all .15s;flex-shrink:0;
+}
+.today-btn:hover{border-color:var(--border2);color:var(--text);}
+
+/* STATS */
+.stats-row{
+  max-width:900px;margin:18px auto 0;padding:0 24px;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:16px;
+  display:flex;align-items:center;gap:12px;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:var(--border2);}
+.stat-icon{font-size:1.5rem;}
+.stat-label{font-size:.7rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+.stat-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-top:2px;}
+
+/* MAIN */
+.main-wrap{max-width:900px;margin:20px auto 40px;padding:0 24px;}
+.room-card{background:var(--card);border:1px solid var(--border);border-radius:22px;overflow:hidden;}
+.room-header{
+  padding:22px 24px;
+  background:linear-gradient(135deg,#1e2d4a 0%,#192038 100%);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px;
+}
+.room-icon{
+  width:48px;height:48px;border-radius:12px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
+  box-shadow:0 4px 16px rgba(245,197,66,.35);flex-shrink:0;
+}
+.room-title h2{font-size:1.05rem;font-weight:800;}
+.room-title p{font-size:.73rem;color:var(--muted);margin-top:3px;}
+.room-badges{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.badge{
+  font-size:.7rem;font-weight:700;padding:5px 11px;border-radius:20px;
+  border:1px solid;white-space:nowrap;
+}
+.badge-cap  {background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:var(--blue);}
+.badge-avail{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
+.badge-busy {background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--red);}
+
+/* SLOTS */
+.slots-wrap{padding:18px 18px 18px;}
+.slots-grid{display:flex;flex-direction:column;gap:7px;max-height:540px;overflow-y:auto;padding-right:4px;}
+.slots-grid::-webkit-scrollbar{width:4px;}
+.slots-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+.slot{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 15px;border-radius:12px;
+  border:1px solid var(--border);background:var(--bg2);
+  transition:all .18s;
+}
+.slot.available{cursor:pointer;}
+.slot.available:hover{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateX(4px);}
+.slot.booked{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.18);}
+.slot.mine  {background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);}
+
+.slot-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.slot.available .slot-dot{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5);}
+.slot.booked    .slot-dot{background:var(--red);}
+.slot.mine      .slot-dot{background:var(--green);}
+
+.slot-time{
+  font-size:.78rem;font-weight:700;min-width:98px;
+  color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+.slot-info{flex:1;min-width:0;}
+.slot-who{font-size:.84rem;font-weight:700;}
+.slot-tags{display:flex;gap:6px;align-items:center;margin-top:4px;flex-wrap:wrap;}
+.dept-badge{
+  font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:20px;
+  background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.25);color:var(--blue);
+}
+.slot-why{font-size:.73rem;color:var(--muted);}
+.slot-free{font-size:.8rem;color:var(--muted2);}
+
+.slot-actions{display:flex;gap:6px;flex-shrink:0;}
+.sbtn{
+  font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:7px;
+  border:none;cursor:pointer;font-family:var(--font);
+  transition:all .15s;text-transform:uppercase;letter-spacing:.04em;
+}
+.sbtn-book  {background:var(--gold);color:#000;}
+.sbtn-book:hover{background:var(--gold2);}
+.sbtn-cancel{background:rgba(239,68,68,.14);color:var(--red);border:1px solid rgba(239,68,68,.28)!important;}
+.sbtn-cancel:hover{background:rgba(239,68,68,.26);}
+.sbtn-edit  {background:rgba(59,130,246,.14);color:var(--blue);border:1px solid rgba(59,130,246,.28)!important;}
+.sbtn-edit:hover{background:rgba(59,130,246,.26);}
+
+/* OVERLAYS */
+.overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
+  z-index:300;align-items:center;justify-content:center;padding:16px;
+}
+.overlay.open{display:flex;}
+
+.modal{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:24px;padding:32px;width:100%;max-width:440px;
+  box-shadow:0 40px 100px rgba(0,0,0,.55);
+  animation:pop .22s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes pop{from{opacity:0;transform:scale(.9) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+
+.modal-badge{
+  font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;
+}
+.modal h3{font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+.modal .modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:24px;}
+
+.fgroup{margin-bottom:15px;}
+.fgroup label{
+  display:block;font-size:.7rem;font-weight:700;
+  text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;
+}
+.fgroup input,.fgroup select{
+  width:100%;background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text);padding:12px 14px;border-radius:11px;
+  font-size:.88rem;font-family:var(--font);outline:none;transition:border-color .2s;
+}
+.fgroup input:focus,.fgroup select:focus{border-color:var(--gold);}
+.fgroup select option{background:var(--card);}
+
+.modal-btns{display:flex;gap:10px;margin-top:22px;}
+.mbtn-primary{
+  flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;border:none;padding:13px;border-radius:11px;
+  font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:opacity .15s;
+}
+.mbtn-primary:hover{opacity:.88;}
+.mbtn-secondary{
+  flex:1;background:transparent;color:var(--muted);
+  border:1px solid var(--border2);padding:13px;border-radius:11px;
+  font-weight:500;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:all .15s;
+}
+.mbtn-secondary:hover{color:var(--text);border-color:var(--border2);}
+
+/* ADMIN PANEL */
+.admin-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(10px);
+  z-index:400;align-items:center;justify-content:center;padding:16px;
+}
+.admin-overlay.open{display:flex;}
+.admin-modal{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:24px;padding:30px;width:100%;max-width:580px;
+  max-height:88vh;overflow-y:auto;
+  box-shadow:0 40px 100px rgba(0,0,0,.6);
+  animation:pop .22s cubic-bezier(.34,1.56,.64,1);
+}
+.admin-modal::-webkit-scrollbar{width:4px;}
+.admin-modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.admin-header h2{font-size:1.15rem;font-weight:800;}
+.admin-close-btn{
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
+  color:var(--red);width:34px;height:34px;border-radius:9px;
+  cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;
+}
+.admin-date-info{font-size:.78rem;color:var(--muted);margin-bottom:18px;}
+
+.abi{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:13px;padding:14px 16px;margin-bottom:9px;
+  display:flex;align-items:flex-start;gap:12px;
+}
+.abi-info{flex:1;min-width:0;}
+.abi-name{font-weight:700;font-size:.88rem;}
+.abi-dept{
+  font-size:.68rem;background:rgba(59,130,246,.12);
+  border:1px solid rgba(59,130,246,.2);color:var(--blue);
+  display:inline-block;padding:2px 8px;border-radius:20px;margin-top:4px;
+}
+.abi-meta{font-size:.74rem;color:var(--muted);margin-top:4px;}
+.abi-actions{display:flex;gap:6px;flex-shrink:0;margin-top:2px;}
+.no-bookings{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;}
+
+.admin-login-wrap{text-align:center;}
+.admin-login-wrap .lock{font-size:3rem;margin-bottom:12px;}
+.admin-login-wrap h3{font-size:1.1rem;font-weight:800;margin-bottom:6px;}
+.admin-login-wrap p{font-size:.82rem;color:var(--muted);margin-bottom:22px;}
+
+/* LEGEND */
+.legend{
+  max-width:900px;margin:0 auto 32px;padding:0 24px;
+  display:flex;gap:22px;flex-wrap:wrap;
+}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);}
+.leg-dot{width:8px;height:8px;border-radius:50%;}
+
+/* FOOTER */
+.footer{
+  text-align:center;padding:22px;font-size:.72rem;
+  color:var(--muted2);border-top:1px solid var(--border);
 }
 
-/* ── Base ───────────────────────────────────────────────── */
-body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: 'Epilogue', sans-serif;
-  min-height: 100vh;
-  padding: 28px 16px 60px;
-}
-
-/* ── Header ─────────────────────────────────────────────── */
-.header {
-  max-width: 680px;
-  margin: 0 auto 32px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 16px;
-  flex-wrap: wrap;
-  border-bottom: 2px solid var(--ink);
-  padding-bottom: 20px;
-}
-
-.header-left h1 {
-  font-family: 'Syne', sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
-  font-weight: 800;
-  letter-spacing: -1px;
-  line-height: 1;
-}
-
-.header-left p {
-  color: var(--muted);
-  font-size: 0.85rem;
-  margin-top: 6px;
-}
-
-.user-chip {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background: var(--ink);
-  color: #fff;
-  border-radius: 40px;
-  padding: 8px 16px 8px 8px;
-}
-
-.user-chip .avatar {
-  width: 30px; height: 30px;
-  border-radius: 50%;
-  background: var(--yellow);
-  color: var(--ink);
-  font-weight: 800;
-  font-size: 0.85rem;
-  display: flex; align-items: center; justify-content: center;
-  font-family: 'Syne', sans-serif;
-}
-
-.user-chip input {
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-family: 'Epilogue', sans-serif;
-  font-size: 0.88rem;
-  outline: none;
-  width: 140px;
-}
-
-.user-chip input::placeholder { color: rgba(255,255,255,.45); }
-
-/* ── Date Nav ───────────────────────────────────────────── */
-.date-row {
-  max-width: 680px;
-  margin: 0 auto 28px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.date-row .date-label {
-  flex: 1;
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: clamp(0.95rem, 2vw, 1.15rem);
-}
-
-.date-row .today-tag {
-  background: var(--yellow);
-  color: var(--ink);
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 20px;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.nav-btn {
-  background: var(--surface);
-  border: 1.5px solid var(--border);
-  color: var(--ink);
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-size: 1.1rem;
-  display: flex; align-items: center; justify-content: center;
-  transition: all .15s;
-  flex-shrink: 0;
-}
-.nav-btn:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
-
-.today-btn {
-  background: transparent;
-  border: 1.5px solid var(--border);
-  color: var(--muted);
-  font-family: 'Epilogue', sans-serif;
-  font-size: 0.78rem;
-  font-weight: 600;
-  padding: 0 14px;
-  height: 38px;
-  border-radius: 40px;
-  cursor: pointer;
-  transition: all .15s;
-  flex-shrink: 0;
-}
-.today-btn:hover { border-color: var(--ink); color: var(--ink); }
-
-/* ── Status banner ──────────────────────────────────────── */
-#statusBanner {
-  max-width: 680px;
-  margin: 0 auto 20px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  font-size: 0.82rem;
-  font-weight: 500;
-  display: none;
-}
-#statusBanner.info  { background: #e8f4fd; color: #2a6496; border: 1px solid #b8d9f0; display:block; }
-#statusBanner.error { background: #fdf0ee; color: #c84b31; border: 1px solid #f0c4bc; display:block; }
-#statusBanner.ok    { background: #eef6f0; color: #3a7d44; border: 1px solid #b8ddbf; display:block; }
-
-/* ── Rooms Grid ─────────────────────────────────────────── */
-.rooms-grid {
-  max-width: 680px;
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-/* ── Room Card ──────────────────────────────────────────── */
-.room-card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-  border: 1.5px solid var(--border);
-}
-
-.room-card-header {
-  padding: 18px 20px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.room-stripe {
-  width: 6px;
-  height: 38px;
-  border-radius: 4px;
-  flex-shrink: 0;
-}
-
-.room-card-header h2 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 700;
-  font-size: 1.05rem;
-}
-
-.room-card-header .cap {
-  margin-left: auto;
-  font-size: 0.75rem;
-  color: var(--muted);
-  background: var(--bg);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--border);
-}
-
-/* ── Slots ──────────────────────────────────────────────── */
-.slots-list {
-  padding: 0 14px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  max-height: 600px;
-  overflow-y: auto;
-}
-
-.slots-list::-webkit-scrollbar { width: 4px; }
-.slots-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-
-.slot {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 9px 11px;
-  border-radius: 9px;
-  border: 1.5px solid var(--border);
-  transition: all .15s;
-  background: var(--bg);
-}
-
-.slot.available { cursor: pointer; }
-.slot.available:hover { border-color: var(--avail); background: #eef6f0; }
-
-.slot.taken {
-  background: #fdf0ee;
-  border-color: #f0c4bc;
-}
-
-.slot.mine {
-  background: #eef3fa;
-  border-color: #b8d3f0;
-  cursor: pointer;
-}
-
-.slot-indicator {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.slot.available .slot-indicator { background: var(--avail); }
-.slot.taken     .slot-indicator { background: var(--taken); }
-.slot.mine      .slot-indicator { background: var(--mine); }
-
-.slot-time {
-  font-size: 0.78rem;
-  font-weight: 600;
-  min-width: 92px;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-
-.slot-info { flex: 1; }
-.slot-info .who    { font-size: 0.82rem; font-weight: 600; color: var(--ink); }
-.slot-info .why    { font-size: 0.74rem; color: var(--muted); }
-.slot-info .free   { font-size: 0.8rem; color: var(--avail); font-weight: 500; }
-
-.slot-btn {
-  font-size: 0.73rem;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-family: 'Epilogue', sans-serif;
-  transition: all .15s;
-  flex-shrink: 0;
-  text-transform: uppercase;
-  letter-spacing: .04em;
-}
-
-.btn-book   { background: var(--ink); color: #fff; }
-.btn-book:hover { background: #3a3830; }
-.btn-cancel { background: transparent; color: var(--taken); border: 1.5px solid var(--taken) !important; }
-.btn-cancel:hover { background: var(--taken); color: #fff; }
-
-/* ── Modal ──────────────────────────────────────────────── */
-.overlay {
-  display: none;
-  position: fixed; inset: 0;
-  background: rgba(26,24,20,.55);
-  backdrop-filter: blur(3px);
-  z-index: 200;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-.overlay.open { display: flex; }
-
-.modal {
-  background: var(--surface);
-  border-radius: 20px;
-  padding: 30px;
-  width: 100%; max-width: 420px;
-  box-shadow: 0 24px 60px rgba(26,24,20,.18);
-  animation: pop .22s cubic-bezier(.34,1.56,.64,1);
-}
-
-@keyframes pop {
-  from { opacity:0; transform: scale(.93) translateY(12px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
-}
-
-.modal-room-tag {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-bottom: 10px;
-}
-
-.modal h3 {
-  font-family: 'Syne', sans-serif;
-  font-weight: 800;
-  font-size: 1.35rem;
-  margin-bottom: 4px;
-}
-
-.modal .slot-detail {
-  font-size: 0.82rem;
-  color: var(--muted);
-  margin-bottom: 24px;
-}
-
-.form-group { margin-bottom: 16px; }
-
-.form-group label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--muted);
-  margin-bottom: 7px;
-}
-
-.form-group input {
-  width: 100%;
-  background: var(--bg);
-  border: 1.5px solid var(--border);
-  color: var(--ink);
-  padding: 11px 14px;
-  border-radius: 10px;
-  font-size: 0.9rem;
-  font-family: 'Epilogue', sans-serif;
-  outline: none;
-  transition: border-color .2s;
-}
-.form-group input:focus { border-color: var(--ink); }
-
-.modal-actions { display: flex; gap: 10px; margin-top: 22px; }
-
-.btn-confirm {
-  flex: 1;
-  background: var(--ink);
-  color: #fff;
-  border: none;
-  padding: 13px;
-  border-radius: 10px;
-  font-weight: 700;
-  font-size: 0.88rem;
-  cursor: pointer;
-  font-family: 'Syne', sans-serif;
-  transition: background .15s;
-}
-.btn-confirm:hover { background: #3a3830; }
-
-.btn-dismiss {
-  flex: 1;
-  background: transparent;
-  color: var(--muted);
-  border: 1.5px solid var(--border);
-  padding: 13px;
-  border-radius: 10px;
-  font-weight: 500;
-  font-size: 0.88rem;
-  cursor: pointer;
-  font-family: 'Epilogue', sans-serif;
-  transition: all .15s;
-}
-.btn-dismiss:hover { border-color: var(--ink); color: var(--ink); }
-
-/* ── Legend ─────────────────────────────────────────────── */
-.legend {
-  max-width: 680px;
-  margin: 28px auto 0;
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-  font-size: 0.78rem;
-  color: var(--muted);
-}
-.legend-item { display: flex; align-items: center; gap: 6px; }
-.legend-dot  { width: 8px; height: 8px; border-radius: 50%; }
-
-/* ── Setup Notice ───────────────────────────────────────── */
-#setupNotice {
-  max-width: 680px;
-  margin: 0 auto 24px;
-  background: #fffbea;
-  border: 1.5px solid #f5d76e;
-  border-radius: 12px;
-  padding: 16px 20px;
-  font-size: 0.85rem;
-  line-height: 1.7;
-}
-#setupNotice strong { font-family: 'Syne', sans-serif; display:block; margin-bottom:4px; font-size:0.95rem; }
-#setupNotice code {
-  background: rgba(0,0,0,.07);
-  padding: 1px 6px;
-  border-radius: 4px;
-  font-size: 0.82rem;
+@media(max-width:520px){
+  .hero-inner{padding:20px 16px;}
+  .brand-logo{width:44px;height:44px;font-size:1.3rem;}
+  .stats-row{gap:8px;}
+  .stat-card{padding:12px 10px;gap:8px;}
+  .stat-val{font-size:1.2rem;}
+  .main-wrap,.date-strip,.stats-row,.legend{padding:0 14px;}
+  .main-wrap{margin-top:16px;}
+  .slot-time{min-width:80px;}
+  .dept-badge{display:none;}
 }
 </style>
 </head>
 <body>
 
-<!-- Firebase configured for SankenOverseas -->
-
-<!-- Header -->
-<div class="header">
-  <div class="header-left">
-    <h1>SankenOverseas</h1>
-    <p>Boardroom Booking · Pvt Ltd</p>
-  </div>
-  <div class="user-chip">
-    <div class="avatar" id="avatarLetter">?</div>
-    <input type="text" id="userNameInput" placeholder="Your name…" maxlength="30" autocomplete="off">
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <div class="brand">
+      <div class="brand-logo">S</div>
+      <div class="brand-text">
+        <h1>SankenOverseas Pvt Ltd</h1>
+        <p>🏢 Boardroom Reservation System</p>
+        <div class="live-dot" id="liveIndicator">Connecting…</div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="user-pill">
+        <div class="user-avatar" id="avatarEl">?</div>
+        <input type="text" id="userInput" placeholder="Your name…" maxlength="30" autocomplete="off">
+      </div>
+      <button class="admin-btn" id="adminToggle" onclick="openAdminLogin()">⚙️ Admin</button>
+    </div>
   </div>
 </div>
 
-<!-- Status -->
-<div id="statusBanner"></div>
+<!-- STATUS -->
+<div id="statusBar"><div id="statusInner" class="status-inner"></div></div>
 
-<!-- Date navigation -->
-<div class="date-row">
+<!-- DATE STRIP -->
+<div class="date-strip">
   <button class="nav-btn" onclick="changeDay(-1)">‹</button>
-  <div style="flex:1">
-    <div class="date-label" id="dateLabel"></div>
+  <div class="date-info">
+    <div class="date-main" id="dateMain"></div>
+    <div class="date-sub" id="dateSub"></div>
   </div>
   <button class="nav-btn" onclick="changeDay(1)">›</button>
   <button class="today-btn" onclick="goToday()">Today</button>
 </div>
 
-<!-- Rooms -->
-<div class="rooms-grid" id="roomsGrid"></div>
-
-<!-- Legend -->
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot" style="background:var(--avail)"></div> Available</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--taken)"></div> Booked by others</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--mine)"></div> Your booking</div>
+<!-- STATS -->
+<div class="stats-row">
+  <div class="stat-card">
+    <div class="stat-icon">📋</div>
+    <div><div class="stat-label">Total Slots</div><div class="stat-val" id="statTotal">20</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">✅</div>
+    <div><div class="stat-label">Available</div><div class="stat-val" id="statAvail" style="color:var(--green)">–</div></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon">🔒</div>
+    <div><div class="stat-label">Booked</div><div class="stat-val" id="statBooked" style="color:var(--red)">–</div></div>
+  </div>
 </div>
 
-<!-- Modal -->
-<div class="overlay" id="overlay">
-  <div class="modal">
-    <div class="modal-room-tag" id="modalRoomTag"></div>
-    <h3 id="modalTitle">Book Slot</h3>
-    <div class="slot-detail" id="modalDetail"></div>
-    <div class="form-group">
-      <label>Your Name</label>
-      <input type="text" id="mName" placeholder="e.g. Kasun Perera" maxlength="30">
+<!-- ROOM CARD -->
+<div class="main-wrap">
+  <div class="room-card">
+    <div class="room-header">
+      <div class="room-icon">🏛️</div>
+      <div class="room-title">
+        <h2>Boardroom</h2>
+        <p>1st Floor Meeting Room</p>
+      </div>
+      <div class="room-badges">
+        <span class="badge badge-cap">👥 8 People</span>
+        <span class="badge" id="availBadge">– Available</span>
+      </div>
     </div>
-    <div class="form-group">
-      <label>Meeting Purpose</label>
-      <input type="text" id="mPurpose" placeholder="e.g. Weekly sync, Client call…" maxlength="60">
-    </div>
-    <div class="modal-actions">
-      <button class="btn-dismiss" onclick="closeModal()">Cancel</button>
-      <button class="btn-confirm" onclick="confirmBooking()">🔒 Confirm Booking</button>
+    <div class="slots-wrap">
+      <div class="slots-grid" id="slotsList"></div>
     </div>
   </div>
 </div>
 
-<script>
-// ─────────────────────────────────────────────
-// Config
-// ─────────────────────────────────────────────
-const ROOMS = [
-  { id: 'room1', name: 'Boardroom', capacity: '8 people', color: '#c84b31' }
-];
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--green);box-shadow:0 0 5px rgba(34,197,94,.5)"></div>Available</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--red)"></div>Booked by others</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Your booking</div>
+</div>
 
-// Half-hour slots 08:00 → 18:00
+<div class="footer">© Copyright : Administration Department – Sanken Overseas Pvt Ltd · All rights reserved</div>
+
+<!-- BOOK MODAL -->
+<div class="overlay" id="bookOverlay">
+  <div class="modal">
+    <div class="modal-badge" style="background:rgba(245,197,66,.15);color:var(--gold);border:1px solid rgba(245,197,66,.3)">🏛️ Boardroom</div>
+    <h3 id="bookTitle">Book Slot</h3>
+    <div class="modal-sub" id="bookSub"></div>
+    <div class="fgroup">
+      <label>Your Full Name</label>
+      <input type="text" id="bName" placeholder="e.g. Kasun Perera" maxlength="40">
+    </div>
+    <div class="fgroup">
+      <label>Department</label>
+      <select id="bDept">
+        <option value="">— Select your department —</option>
+        <option>Administration</option>
+        <option>Finance &amp; Accounts</option>
+        <option>Human Resources</option>
+        <option>Sales &amp; Marketing</option>
+        <option>Operations</option>
+        <option>Information Technology</option>
+        <option>Procurement</option>
+        <option>Logistics</option>
+        <option>Legal &amp; Compliance</option>
+        <option>Management</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Meeting Purpose</label>
+      <input type="text" id="bPurpose" placeholder="e.g. Weekly sync, Client presentation…" maxlength="60">
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn-secondary" onclick="closeBook()">Cancel</button>
+      <button class="mbtn-primary" onclick="confirmBook()">🔒 Confirm Booking</button>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="overlay" id="editOverlay">
+  <div class="modal">
+    <div class="modal-badge" style="background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)">✏️ Edit Booking</div>
+    <h3 id="editTitle">Edit Slot</h3>
+    <div class="modal-sub" id="editSub"></div>
+    <div class="fgroup">
+      <label>Name</label>
+      <input type="text" id="eName" maxlength="40">
+    </div>
+    <div class="fgroup">
+      <label>Department</label>
+      <select id="eDept">
+        <option value="">— Select department —</option>
+        <option>Administration</option>
+        <option>Finance &amp; Accounts</option>
+        <option>Human Resources</option>
+        <option>Sales &amp; Marketing</option>
+        <option>Operations</option>
+        <option>Information Technology</option>
+        <option>Procurement</option>
+        <option>Logistics</option>
+        <option>Legal &amp; Compliance</option>
+        <option>Management</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Meeting Purpose</label>
+      <input type="text" id="ePurpose" maxlength="60">
+    </div>
+    <div class="modal-btns">
+      <button class="mbtn-secondary" onclick="closeEdit()">Cancel</button>
+      <button class="mbtn-primary" onclick="confirmEdit()">💾 Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN OVERLAY -->
+<div class="admin-overlay" id="adminOverlay">
+  <div class="admin-modal">
+
+    <!-- Login -->
+    <div id="adminLoginWrap" class="admin-login-wrap">
+      <div class="lock">🔐</div>
+      <h3>Admin Access</h3>
+      <p>Enter the administrator password to manage all bookings on any date.</p>
+      <div class="fgroup">
+        <label>Password</label>
+        <input type="password" id="adminPassInput" placeholder="Enter password…"
+          onkeydown="if(event.key==='Enter')verifyAdmin()">
+      </div>
+      <div class="modal-btns">
+        <button class="mbtn-secondary" onclick="closeAdmin()">Cancel</button>
+        <button class="mbtn-primary" onclick="verifyAdmin()">🔓 Login</button>
+      </div>
+    </div>
+
+    <!-- Panel -->
+    <div id="adminPanelWrap" style="display:none">
+      <div class="admin-header">
+        <h2>⚙️ Admin — All Bookings</h2>
+        <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
+      </div>
+      <div class="admin-date-info" id="adminDateInfo"></div>
+      <div id="adminList"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ─── Config ───────────────────────────────────────────
+const ADMIN_PASSWORD = 'sanken2024'; // ← change this to your own password
+
+// 30-min slots 08:00–18:00
 const SLOTS = [];
-for (let h = 8; h < 18; h++) {
+for(let h=8;h<18;h++){
   SLOTS.push(`${String(h).padStart(2,'0')}:00`);
   SLOTS.push(`${String(h).padStart(2,'0')}:30`);
 }
 
-// ─────────────────────────────────────────────
-// State
-// ─────────────────────────────────────────────
+// ─── State ────────────────────────────────────────────
 let currentDate = today();
-let userName    = '';
-let bookings    = {};   // key → { name, purpose, bookedAt }
-let pendingSlot = null;
-let firebaseReady = false;
-let dbListeners   = {};
+let userName = '', bookings = {}, firebaseOK = false, isAdmin = false;
+let pendingSlot = null, editKey = null;
 
-// ─────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────
-function today() {
-  const d = new Date(); d.setHours(0,0,0,0); return d;
-}
+// ─── Utils ────────────────────────────────────────────
+function today(){ const d=new Date();d.setHours(0,0,0,0);return d; }
+function dateKey(d){ return d.toISOString().slice(0,10); }
+function slotKey(time){ return `room1__${dateKey(currentDate)}__${time.replace(':','h')}`; }
+function nextTime(t){ const[h,m]=t.split(':').map(Number);const tot=h*60+m+30;return `${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`; }
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function isToday(d){ return d.getTime()===today().getTime(); }
 
-function dateKey(d) {
-  return d.toISOString().slice(0,10);
-}
-
-function slotKey(roomId, time) {
-  return `${roomId}__${dateKey(currentDate)}__${time.replace(':','h')}`;
-}
-
-function formatDate(d) {
-  return d.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-}
-
-function isToday(d) {
-  return d.getTime() === today().getTime();
-}
-
-function nextTime(t) {
-  const [h,m] = t.split(':').map(Number);
-  const total = h*60 + m + 30;
-  return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`;
-}
-
-// ─────────────────────────────────────────────
-// Local storage fallback
-// ─────────────────────────────────────────────
-function localGet()    { try { return JSON.parse(localStorage.getItem('mbookings')||'{}'); } catch { return {}; } }
-function localSet(b)   { localStorage.setItem('mbookings', JSON.stringify(b)); }
-
-// ─────────────────────────────────────────────
-// Firebase integration
-// ─────────────────────────────────────────────
-window.addEventListener('firebase-ready', () => {
-  const cfg = document.querySelector('script[type="module"]').textContent;
-  if (cfg.includes('YOUR_API_KEY')) {
-    showStatus('Firebase not configured yet — running in single-device demo mode.', 'info');
-    bookings = localGet();
-    render();
-    return;
-  }
-  firebaseReady = true;
-  document.getElementById('setupNotice').style.display = 'none';
-  showStatus('Connected — bookings sync in real time ✓', 'ok');
-  setTimeout(() => hideStatus(), 3000);
-  subscribeToDate();
+// ─── Firebase ─────────────────────────────────────────
+window.addEventListener('firebase-ready',()=>{
+  firebaseOK=true;
+  document.getElementById('liveIndicator').textContent='● Live sync active';
+  subscribeDate();
+  showStatus('Connected — real-time sync active ✓','info');
+  setTimeout(hideStatus,3500);
 });
 
-function subscribeToDate() {
-  if (!firebaseReady) return;
-  const { db, ref, onValue } = window._fb;
-  const path = `bookings/${dateKey(currentDate)}`;
-  // Unsubscribe previous
-  if (dbListeners[path]) dbListeners[path]();
-  const r = ref(db, path);
-  const unsub = onValue(r, snap => {
-    bookings = snap.val() || {};
+let unsub=null;
+function subscribeDate(){
+  if(!firebaseOK)return;
+  const{db,ref,onValue}=window._fb;
+  if(unsub)unsub();
+  unsub=onValue(ref(db,`bookings/${dateKey(currentDate)}`),snap=>{
+    bookings=snap.val()||{};
     render();
   });
-  dbListeners[path] = unsub;
 }
 
-async function fbSet(key, data) {
-  if (!firebaseReady) { const b=localGet(); b[key]=data; localSet(b); bookings=localGet(); render(); return; }
-  const { db, ref, set } = window._fb;
-  const [roomId, date, time] = key.split('__');
-  await set(ref(db, `bookings/${date}/${key}`), data);
+async function fbSet(key,data){
+  if(!firebaseOK){
+    const b=JSON.parse(localStorage.getItem('mb')||'{}');
+    b[key]=data;localStorage.setItem('mb',JSON.stringify(b));
+    bookings=b;render();return;
+  }
+  const{db,ref,set}=window._fb;
+  const[,date]=key.split('__');
+  await set(ref(db,`bookings/${date}/${key}`),data);
 }
 
-async function fbRemove(key) {
-  if (!firebaseReady) { const b=localGet(); delete b[key]; localSet(b); bookings=localGet(); render(); return; }
-  const { db, ref, remove } = window._fb;
-  const [roomId, date, time] = key.split('__');
-  await remove(ref(db, `bookings/${date}/${key}`));
+async function fbRemove(key){
+  if(!firebaseOK){
+    const b=JSON.parse(localStorage.getItem('mb')||'{}');
+    delete b[key];localStorage.setItem('mb',JSON.stringify(b));
+    bookings=b;render();return;
+  }
+  const{db,ref,remove}=window._fb;
+  const[,date]=key.split('__');
+  await remove(ref(db,`bookings/${date}/${key}`));
 }
 
-// ─────────────────────────────────────────────
-// Render
-// ─────────────────────────────────────────────
-function render() {
-  // Date label
-  document.getElementById('dateLabel').innerHTML =
-    `${formatDate(currentDate)}${isToday(currentDate) ? ' <span class="today-tag">Today</span>' : ''}`;
+// ─── Render ───────────────────────────────────────────
+function render(){
+  // Date header
+  const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
+  document.getElementById('dateMain').innerHTML=
+    currentDate.toLocaleDateString('en-US',opts)+
+    (isToday(currentDate)?'<span class="today-tag">Today</span>':'');
+  document.getElementById('dateSub').textContent=
+    isToday(currentDate)?'Showing live availability for today':'Showing availability for selected date';
 
-  const grid = document.getElementById('roomsGrid');
-  grid.innerHTML = '';
+  // Stats
+  const booked=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`)).length;
+  const avail=SLOTS.length-booked;
+  document.getElementById('statAvail').textContent=avail;
+  document.getElementById('statBooked').textContent=booked;
 
-  ROOMS.forEach(room => {
-    const card = document.createElement('div');
-    card.className = 'room-card';
-    card.innerHTML = `
-      <div class="room-card-header">
-        <div class="room-stripe" style="background:${room.color}"></div>
-        <h2>${room.name}</h2>
-        <span class="cap">👥 ${room.capacity}</span>
-      </div>
-      <div class="slots-list" id="sl_${room.id}"></div>
-    `;
-    grid.appendChild(card);
+  // Badge
+  const badge=document.getElementById('availBadge');
+  badge.textContent=`${avail} Available`;
+  badge.className='badge '+(avail>0?'badge-avail':'badge-busy');
 
-    const list = card.querySelector(`#sl_${room.id}`);
-    SLOTS.forEach(time => {
-      const key  = slotKey(room.id, time);
-      const end  = nextTime(time);
-      const bk   = bookings[key];
-      const mine = bk && bk.name === userName && userName.trim() !== '';
-      const cls  = bk ? (mine ? 'mine' : 'taken') : 'available';
+  // Slots
+  const list=document.getElementById('slotsList');
+  list.innerHTML='';
+  SLOTS.forEach(time=>{
+    const key=slotKey(time);
+    const end=nextTime(time);
+    const bk=bookings[key];
+    const mine=bk&&bk.name===userName&&userName.trim()!=='';
+    const cls=bk?(mine?'mine':'booked'):'available';
 
-      const slot = document.createElement('div');
-      slot.className = `slot ${cls}`;
+    const div=document.createElement('div');
+    div.className=`slot ${cls}`;
 
-      let infoHTML = '';
-      let btnHTML  = '';
-
-      if (bk) {
-        infoHTML = `<div class="slot-info"><div class="who">${esc(bk.name)}</div><div class="why">${esc(bk.purpose)}</div></div>`;
-        if (mine) btnHTML = `<button class="slot-btn btn-cancel" onclick="cancelSlot('${key}')">Cancel</button>`;
-      } else {
-        infoHTML = `<div class="slot-info"><span class="free">Available</span></div>`;
-        btnHTML  = `<button class="slot-btn btn-book" onclick="openModal('${room.id}','${esc(room.name)}','${time}','${end}','${room.color}')">Book</button>`;
+    let info='',actions='';
+    if(bk){
+      info=`<div class="slot-info">
+        <div class="slot-who">${esc(bk.name)}</div>
+        <div class="slot-tags">
+          ${bk.dept?`<span class="dept-badge">${esc(bk.dept)}</span>`:''}
+          <span class="slot-why">${esc(bk.purpose)}</span>
+        </div>
+      </div>`;
+      if(mine) actions+=`<button class="sbtn sbtn-cancel" onclick="cancelSlot('${key}')">Cancel</button>`;
+      if(isAdmin){
+        actions+=`<button class="sbtn sbtn-edit" onclick="openEdit('${key}')">Edit</button>`;
+        actions+=`<button class="sbtn sbtn-cancel" onclick="adminDel('${key}')">Del</button>`;
       }
+    } else {
+      info=`<div class="slot-info"><span class="slot-free">Available — tap to book</span></div>`;
+      actions=`<button class="sbtn sbtn-book" onclick="openBook('${time}','${end}')">Book</button>`;
+    }
 
-      slot.innerHTML = `
-        <div class="slot-indicator"></div>
-        <div class="slot-time">${time} – ${end}</div>
-        ${infoHTML}
-        ${btnHTML}
-      `;
-      list.appendChild(slot);
-    });
+    div.innerHTML=`
+      <div class="slot-dot"></div>
+      <div class="slot-time">${time} – ${end}</div>
+      ${info}
+      <div class="slot-actions">${actions}</div>`;
+    list.appendChild(div);
   });
 }
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-
-// ─────────────────────────────────────────────
-// Date navigation
-// ─────────────────────────────────────────────
-function changeDay(n) {
-  currentDate = new Date(currentDate);
-  currentDate.setDate(currentDate.getDate() + n);
-  subscribeToDate();
-  if (!firebaseReady) render();
+// ─── Date nav ─────────────────────────────────────────
+function changeDay(n){
+  currentDate=new Date(currentDate);
+  currentDate.setDate(currentDate.getDate()+n);
+  subscribeDate();
+  if(!firebaseOK)render();
 }
+function goToday(){currentDate=today();subscribeDate();if(!firebaseOK)render();}
 
-function goToday() {
-  currentDate = today();
-  subscribeToDate();
-  if (!firebaseReady) render();
-}
-
-// ─────────────────────────────────────────────
-// Booking modal
-// ─────────────────────────────────────────────
-function openModal(roomId, roomName, time, end, color) {
-  if (!userName.trim()) {
-    showStatus('Please enter your name at the top first.', 'error');
-    document.getElementById('userNameInput').focus();
-    return;
+// ─── Book modal ───────────────────────────────────────
+function openBook(time,end){
+  if(!userName.trim()){
+    showStatus('Please enter your name at the top first','err');
+    document.getElementById('userInput').focus(); return;
   }
-  pendingSlot = { roomId, time };
-  const tag = document.getElementById('modalRoomTag');
-  tag.textContent = roomName;
-  tag.style.background = color + '22';
-  tag.style.color       = color;
-  document.getElementById('modalTitle').textContent   = `${time} – ${end}`;
-  document.getElementById('modalDetail').textContent  = formatDate(currentDate);
-  document.getElementById('mName').value    = userName;
-  document.getElementById('mPurpose').value = '';
-  document.getElementById('overlay').classList.add('open');
-  setTimeout(() => document.getElementById('mPurpose').focus(), 120);
+  pendingSlot=time;
+  document.getElementById('bookTitle').textContent=`${time} – ${end}`;
+  document.getElementById('bookSub').textContent=
+    currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('bName').value=userName;
+  document.getElementById('bDept').value='';
+  document.getElementById('bPurpose').value='';
+  document.getElementById('bookOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('bDept').focus(),120);
 }
+function closeBook(){document.getElementById('bookOverlay').classList.remove('open');pendingSlot=null;}
 
-function closeModal() {
-  document.getElementById('overlay').classList.remove('open');
-  pendingSlot = null;
-}
-
-async function confirmBooking() {
-  const name    = document.getElementById('mName').value.trim();
-  const purpose = document.getElementById('mPurpose').value.trim();
-  if (!name)    { showStatus('Please enter your name.', 'error'); return; }
-  if (!purpose) { showStatus('Please describe the meeting purpose.', 'error'); return; }
-
-  const key = slotKey(pendingSlot.roomId, pendingSlot.time);
-  if (bookings[key]) { showStatus('Slot just got taken — please choose another.', 'error'); closeModal(); return; }
-
-  userName = name;
+async function confirmBook(){
+  const name=document.getElementById('bName').value.trim();
+  const dept=document.getElementById('bDept').value;
+  const purpose=document.getElementById('bPurpose').value.trim();
+  if(!name){showStatus('Please enter your name','err');return;}
+  if(!dept){showStatus('Please select your department','err');return;}
+  if(!purpose){showStatus('Please enter the meeting purpose','err');return;}
+  const key=slotKey(pendingSlot);
+  if(bookings[key]){showStatus('Slot just got taken! Please choose another.','err');closeBook();return;}
+  userName=name;
+  document.getElementById('userInput').value=name;
   updateAvatar();
-
-  await fbSet(key, { name, purpose, bookedAt: Date.now() });
-  closeModal();
-  showStatus('Room booked successfully! 🎉', 'ok');
-  setTimeout(() => hideStatus(), 3000);
+  await fbSet(key,{name,dept,purpose,bookedAt:Date.now()});
+  closeBook();
+  showStatus('✅ Boardroom booked successfully!','ok');
+  setTimeout(hideStatus,3500);
 }
 
-async function cancelSlot(key) {
-  if (!confirm('Cancel your booking for this slot?')) return;
+// ─── Cancel ───────────────────────────────────────────
+async function cancelSlot(key){
+  if(!confirm('Cancel your booking for this slot?'))return;
   await fbRemove(key);
-  showStatus('Booking cancelled.', 'info');
-  setTimeout(() => hideStatus(), 2500);
+  showStatus('Booking cancelled','info');
+  setTimeout(hideStatus,2500);
 }
 
-// ─────────────────────────────────────────────
-// Name input
-// ─────────────────────────────────────────────
-document.getElementById('userNameInput').addEventListener('input', function() {
-  userName = this.value.trim();
-  updateAvatar();
-  render();
-});
+// ─── Edit modal ───────────────────────────────────────
+function openEdit(key){
+  const bk=bookings[key];if(!bk)return;
+  editKey=key;
+  const tp=key.split('__')[2].replace('h',':');
+  document.getElementById('editTitle').textContent=`${tp} – ${nextTime(tp)}`;
+  document.getElementById('editSub').textContent=`Editing booking by ${bk.name}`;
+  document.getElementById('eName').value=bk.name||'';
+  document.getElementById('eDept').value=bk.dept||'';
+  document.getElementById('ePurpose').value=bk.purpose||'';
+  document.getElementById('editOverlay').classList.add('open');
+}
+function closeEdit(){document.getElementById('editOverlay').classList.remove('open');editKey=null;}
 
-function updateAvatar() {
-  const el = document.getElementById('avatarLetter');
-  el.textContent = userName ? userName[0].toUpperCase() : '?';
+async function confirmEdit(){
+  const name=document.getElementById('eName').value.trim();
+  const dept=document.getElementById('eDept').value;
+  const purpose=document.getElementById('ePurpose').value.trim();
+  if(!name||!purpose){showStatus('Name and purpose are required','err');return;}
+  const ex=bookings[editKey];
+  await fbSet(editKey,{...ex,name,dept,purpose});
+  closeEdit();
+  showStatus('✅ Booking updated successfully','ok');
+  setTimeout(hideStatus,2500);
 }
 
-// ─────────────────────────────────────────────
-// Status banner
-// ─────────────────────────────────────────────
-function showStatus(msg, type) {
-  const el = document.getElementById('statusBanner');
-  el.textContent = msg;
-  el.className = type;
+// ─── Admin ────────────────────────────────────────────
+function openAdminLogin(){
+  if(isAdmin){renderAdminPanel();document.getElementById('adminOverlay').classList.add('open');return;}
+  document.getElementById('adminLoginWrap').style.display='block';
+  document.getElementById('adminPanelWrap').style.display='none';
+  document.getElementById('adminPassInput').value='';
+  document.getElementById('adminOverlay').classList.add('open');
+  setTimeout(()=>document.getElementById('adminPassInput').focus(),120);
 }
-function hideStatus() {
-  const el = document.getElementById('statusBanner');
-  el.className = '';
-  el.style.display = 'none';
-  el.textContent = '';
-}
+function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
 
-// ─────────────────────────────────────────────
-// Close modal on overlay click
-// ─────────────────────────────────────────────
-document.getElementById('overlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// ─────────────────────────────────────────────
-// Init (fallback if Firebase module doesn't fire)
-// ─────────────────────────────────────────────
-setTimeout(() => {
-  if (!firebaseReady) {
-    bookings = localGet();
+function verifyAdmin(){
+  if(document.getElementById('adminPassInput').value===ADMIN_PASSWORD){
+    isAdmin=true;
+    document.getElementById('adminToggle').classList.add('active');
+    document.getElementById('adminLoginWrap').style.display='none';
+    document.getElementById('adminPanelWrap').style.display='block';
+    renderAdminPanel();
     render();
+  } else {
+    showStatus('Incorrect password','err');
+    document.getElementById('adminPassInput').value='';
   }
-}, 800);
+}
 
-// Initial render
+function renderAdminPanel(){
+  const ds=currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('adminDateInfo').textContent=`Showing bookings for: ${ds}`;
+  const list=document.getElementById('adminList');
+  list.innerHTML='';
+  const keys=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`)).sort();
+  if(!keys.length){list.innerHTML='<div class="no-bookings">📭 No bookings for this date</div>';return;}
+  keys.forEach(key=>{
+    const bk=bookings[key];
+    const tp=key.split('__')[2].replace('h',':');
+    const end=nextTime(tp);
+    const div=document.createElement('div');
+    div.className='abi';
+    div.innerHTML=`
+      <div class="abi-info">
+        <div class="abi-name">${esc(bk.name)}</div>
+        ${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}
+        <div class="abi-meta">🕐 ${tp} – ${end} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
+      </div>
+      <div class="abi-actions">
+        <button class="sbtn sbtn-edit" onclick="openEdit('${key}');closeAdmin()">Edit</button>
+        <button class="sbtn sbtn-cancel" onclick="adminDel('${key}')">Delete</button>
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+async function adminDel(key){
+  if(!confirm('Delete this booking as admin?'))return;
+  await fbRemove(key);
+  renderAdminPanel();
+  showStatus('Booking deleted','info');
+  setTimeout(hideStatus,2500);
+}
+
+// ─── User input ───────────────────────────────────────
+document.getElementById('userInput').addEventListener('input',function(){
+  userName=this.value.trim();updateAvatar();render();
+});
+function updateAvatar(){
+  document.getElementById('avatarEl').textContent=userName?userName[0].toUpperCase():'?';
+}
+
+// ─── Status ───────────────────────────────────────────
+function showStatus(msg,type){
+  const bar=document.getElementById('statusBar'),inner=document.getElementById('statusInner');
+  inner.className=`status-inner ${type}`;inner.textContent=msg;
+  bar.classList.add('show');
+}
+function hideStatus(){document.getElementById('statusBar').classList.remove('show');}
+
+// ─── Overlay clicks ───────────────────────────────────
+['bookOverlay','editOverlay','adminOverlay'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',e=>{
+    if(e.target.id===id){
+      if(id==='bookOverlay')closeBook();
+      else if(id==='editOverlay')closeEdit();
+      else closeAdmin();
+    }
+  });
+});
+
+// ─── Init ─────────────────────────────────────────────
+setTimeout(()=>{if(!firebaseOK){bookings={};render();}},900);
 render();
 </script>
 </body>
