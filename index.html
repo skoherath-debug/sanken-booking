@@ -4,44 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>SankenOverseas – Boardroom</title>
-
-<!-- PWA Meta -->
 <meta name="application-name" content="Sanken Booking">
 <meta name="apple-mobile-web-app-title" content="Sanken Booking">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1117">
-<meta name="description" content="SankenOverseas Pvt Ltd — Boardroom Booking System">
-<meta name="msapplication-TileColor" content="#f5c542">
-
-<!-- PWA Manifest (inline) -->
-<link rel="manifest" href="data:application/json;charset=utf-8,{
-  %22name%22:%22SankenOverseas%20Boardroom%22,
-  %22short_name%22:%22Sanken%20Booking%22,
-  %22description%22:%22Boardroom%20Reservation%20System%22,
-  %22start_url%22:%22.%22,
-  %22display%22:%22standalone%22,
-  %22background_color%22:%22%230f1117%22,
-  %22theme_color%22:%22%23f5c542%22,
-  %22orientation%22:%22portrait-primary%22,
-  %22icons%22:[{
-    %22src%22:%22data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20192%20192'%3E%3Crect%20width='192'%20height='192'%20rx='32'%20fill='%23f5c542'/%3E%3Ctext%20x='96'%20y='130'%20font-family='Arial'%20font-size='110'%20font-weight='900'%20text-anchor='middle'%20fill='%23000'%3ES%3C/text%3E%3C/svg%3E%22,
-    %22sizes%22:%22192x192%22,
-    %22type%22:%22image/svg+xml%22,
-    %22purpose%22:%22any%20maskable%22
-  }]
-}">
-
-<!-- Apple Touch Icon (gold S on dark) -->
 <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect width='180' height='180' rx='40' fill='%23f5c542'/><text x='90' y='130' font-family='Arial Black,Arial' font-size='115' font-weight='900' text-anchor='middle' fill='%23000'>S</text></svg>">
-
-<!-- Favicon -->
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f5c542'/><text x='16' y='23' font-family='Arial Black,Arial' font-size='20' font-weight='900' text-anchor='middle' fill='%23000'>S</text></svg>">
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+  import { getDatabase, ref, set, remove, onValue, get } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
   const firebaseConfig = {
     apiKey:            "AIzaSyA4D0lxYO339x-9B1M_nOgYbZTNklOqTlM",
     authDomain:        "sanken-booking-df980.firebaseapp.com",
@@ -54,7 +28,7 @@
   };
   const app = initializeApp(firebaseConfig);
   const db  = getDatabase(app);
-  window._fb = { db, ref, set, remove, onValue };
+  window._fb = { db, ref, set, remove, onValue, get };
   window.dispatchEvent(new Event("firebase-ready"));
 </script>
 
@@ -72,10 +46,89 @@
   --font:'Plus Jakarta Sans',sans-serif;
 }
 body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden;
-  padding-bottom:env(safe-area-inset-bottom);
-  padding-left:env(safe-area-inset-left);
-  padding-right:env(safe-area-inset-right);
+  padding-bottom:env(safe-area-inset-bottom);}
+
+/* ── AUTH SCREENS ── */
+#authScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;
+  background:linear-gradient(135deg,#0f1525 0%,#1a2340 50%,#0f1117 100%);
+  position:relative;overflow:hidden;
 }
+#authScreen::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 30% 40%,rgba(245,197,66,.1) 0%,transparent 55%),
+             radial-gradient(ellipse at 70% 70%,rgba(59,130,246,.07) 0%,transparent 50%);
+}
+.auth-box{
+  position:relative;z-index:1;
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:24px;padding:36px 32px;
+  width:100%;max-width:420px;
+  box-shadow:0 40px 100px rgba(0,0,0,.5);
+  animation:fadeIn .4s ease;
+}
+@keyframes fadeIn{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes pop{from{opacity:0;transform:scale(.92) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+
+.auth-logo{
+  width:56px;height:56px;border-radius:16px;
+  background:linear-gradient(135deg,var(--gold),var(--gold2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.8rem;font-weight:900;color:#000;
+  box-shadow:0 6px 24px rgba(245,197,66,.4);
+  margin:0 auto 16px;
+}
+.auth-box h2{font-size:1.3rem;font-weight:800;text-align:center;margin-bottom:4px;}
+.auth-box .auth-sub{font-size:.78rem;color:var(--muted);text-align:center;margin-bottom:26px;}
+.auth-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:4px;margin-bottom:22px;}
+.auth-tab{
+  flex:1;padding:8px;border-radius:8px;border:none;
+  background:transparent;color:var(--muted);
+  font-family:var(--font);font-size:.82rem;font-weight:600;
+  cursor:pointer;transition:all .2s;
+}
+.auth-tab.active{background:var(--card2);color:var(--text);box-shadow:0 2px 8px rgba(0,0,0,.3);}
+
+.fgroup{margin-bottom:14px;}
+.fgroup label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;}
+.fgroup input,.fgroup select{
+  width:100%;background:var(--bg2);border:1px solid var(--border2);
+  color:var(--text);padding:11px 14px;border-radius:10px;
+  font-size:.88rem;font-family:var(--font);outline:none;transition:border-color .2s;
+}
+.fgroup input:focus,.fgroup select:focus{border-color:var(--gold);}
+.fgroup select option{background:var(--card);}
+.fgroup .hint{font-size:.7rem;color:var(--muted);margin-top:5px;}
+
+.auth-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),var(--gold2));
+  color:#000;border:none;padding:13px;border-radius:11px;
+  font-weight:800;font-size:.9rem;cursor:pointer;
+  font-family:var(--font);transition:opacity .15s;margin-top:6px;
+}
+.auth-btn:hover{opacity:.88;}
+.auth-switch{text-align:center;margin-top:16px;font-size:.78rem;color:var(--muted);}
+.auth-switch a{color:var(--gold);cursor:pointer;font-weight:600;text-decoration:none;}
+
+.pending-box{
+  text-align:center;padding:10px 0;
+}
+.pending-icon{font-size:3rem;margin-bottom:12px;}
+.pending-box h3{font-size:1.1rem;font-weight:800;margin-bottom:8px;}
+.pending-box p{font-size:.82rem;color:var(--muted);line-height:1.6;margin-bottom:20px;}
+.pending-box .emp-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px;margin-bottom:16px;text-align:left;
+}
+.pending-box .emp-card .ec-name{font-weight:700;font-size:.9rem;}
+.pending-box .emp-card .ec-meta{font-size:.76rem;color:var(--muted);margin-top:4px;}
+.logout-link{font-size:.78rem;color:var(--muted);cursor:pointer;text-decoration:underline;}
+
+/* ── MAIN APP ── */
+#appScreen{display:none;}
 
 /* HERO */
 .hero{
@@ -87,59 +140,47 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   background:radial-gradient(ellipse at 20% 50%,rgba(245,197,66,.13) 0%,transparent 60%),
              radial-gradient(ellipse at 80% 20%,rgba(59,130,246,.09) 0%,transparent 55%);
 }
-.hero::after{
-  content:'';position:absolute;right:-80px;top:-80px;width:320px;height:320px;border-radius:50%;
-  background:radial-gradient(circle,rgba(245,197,66,.07),transparent 70%);
-}
 .hero-inner{
   position:relative;z-index:1;max-width:900px;margin:0 auto;
-  padding:30px 24px 26px;
-  display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:22px 24px 20px;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
 }
-.brand{display:flex;align-items:center;gap:16px;}
+.brand{display:flex;align-items:center;gap:14px;}
 .brand-logo{
-  width:52px;height:52px;border-radius:14px;
+  width:44px;height:44px;border-radius:12px;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
   display:flex;align-items:center;justify-content:center;
-  font-size:1.6rem;font-weight:800;color:#000;
-  box-shadow:0 6px 24px rgba(245,197,66,.4);flex-shrink:0;
+  font-size:1.3rem;font-weight:900;color:#000;
+  box-shadow:0 4px 16px rgba(245,197,66,.4);flex-shrink:0;
 }
-.brand-text h1{font-size:clamp(1rem,2.5vw,1.3rem);font-weight:800;letter-spacing:-.3px;}
-.brand-text p{font-size:.75rem;color:var(--muted);margin-top:3px;font-weight:500;}
-.live-dot{
-  display:inline-flex;align-items:center;gap:5px;
-  font-size:.68rem;color:var(--green);font-weight:600;margin-top:4px;
-}
-.live-dot::before{
-  content:'';width:6px;height:6px;border-radius:50%;
-  background:var(--green);animation:pulse 2s infinite;
-}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+.brand-text h1{font-size:clamp(.95rem,2.5vw,1.2rem);font-weight:800;letter-spacing:-.3px;}
+.brand-text p{font-size:.72rem;color:var(--muted);margin-top:2px;}
+.live-dot{display:inline-flex;align-items:center;gap:5px;font-size:.65rem;color:var(--green);font-weight:600;margin-top:3px;}
+.live-dot::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
 
-.hero-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-.user-pill{
-  display:flex;align-items:center;gap:10px;
+.hero-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.user-chip{
+  display:flex;align-items:center;gap:8px;
   background:rgba(255,255,255,.07);border:1px solid var(--border2);
-  border-radius:40px;padding:7px 16px 7px 7px;backdrop-filter:blur(8px);
+  border-radius:40px;padding:6px 14px 6px 6px;
 }
-.user-avatar{
-  width:32px;height:32px;border-radius:50%;
+.user-av{
+  width:28px;height:28px;border-radius:50%;
   background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#000;font-weight:800;font-size:.85rem;
+  color:#000;font-weight:800;font-size:.78rem;
   display:flex;align-items:center;justify-content:center;flex-shrink:0;
 }
-.user-pill input{
-  background:transparent;border:none;color:var(--text);
-  font-family:var(--font);font-size:.85rem;outline:none;width:130px;
+.user-chip .uname{font-size:.8rem;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hero-btns{display:flex;gap:8px;}
+.hbtn{
+  font-family:var(--font);font-size:.75rem;font-weight:700;
+  padding:8px 14px;border-radius:9px;cursor:pointer;transition:all .2s;border:1px solid;
 }
-.user-pill input::placeholder{color:var(--muted);}
-.admin-btn{
-  background:rgba(245,197,66,.12);border:1px solid rgba(245,197,66,.3);
-  color:var(--gold);font-family:var(--font);font-size:.78rem;font-weight:700;
-  padding:9px 16px;border-radius:9px;cursor:pointer;transition:all .2s;
-}
-.admin-btn:hover{background:rgba(245,197,66,.22);border-color:var(--gold);}
-.admin-btn.active{background:var(--gold);color:#000;}
+.hbtn-admin{background:rgba(245,197,66,.12);border-color:rgba(245,197,66,.3);color:var(--gold);}
+.hbtn-admin:hover{background:rgba(245,197,66,.22);}
+.hbtn-admin.active{background:var(--gold);color:#000;border-color:var(--gold);}
+.hbtn-logout{background:rgba(239,68,68,.1);border-color:rgba(239,68,68,.25);color:var(--red);}
+.hbtn-logout:hover{background:rgba(239,68,68,.2);}
 
 /* STATUS */
 #statusBar{max-width:900px;margin:0 auto;padding:0 24px;height:0;overflow:hidden;transition:height .3s;}
@@ -149,147 +190,78 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .status-inner.err {background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);}
 .status-inner.info{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.3);color:var(--blue);}
 
-/* DATE STRIP */
-.date-strip{max-width:900px;margin:24px auto 0;padding:0 24px;display:flex;align-items:center;gap:10px;}
-.nav-btn{
-  width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--border);
-  color:var(--text);font-size:1.1rem;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;
-}
+/* DATE */
+.date-strip{max-width:900px;margin:20px auto 0;padding:0 24px;display:flex;align-items:center;gap:10px;}
+.nav-btn{width:38px;height:38px;border-radius:10px;background:var(--card);border:1px solid var(--border);color:var(--text);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0;}
 .nav-btn:hover{background:var(--card2);border-color:var(--border2);}
 .date-info{flex:1;}
 .date-main{font-size:1rem;font-weight:700;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .date-sub{font-size:.73rem;color:var(--muted);margin-top:2px;}
-.today-tag{
-  background:var(--gold);color:#000;font-size:.65rem;font-weight:800;
-  padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;
-}
-.today-btn{
-  background:transparent;border:1px solid var(--border);color:var(--muted);
-  font-family:var(--font);font-size:.78rem;font-weight:600;
-  padding:0 14px;height:38px;border-radius:9px;cursor:pointer;transition:all .15s;flex-shrink:0;
-}
+.today-tag{background:var(--gold);color:#000;font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.05em;}
+.today-btn{background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:600;padding:0 14px;height:38px;border-radius:9px;cursor:pointer;transition:all .15s;flex-shrink:0;}
 .today-btn:hover{border-color:var(--border2);color:var(--text);}
 
 /* STATS */
-.stats-row{
-  max-width:900px;margin:18px auto 0;padding:0 24px;
-  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
-}
-.stat-card{
-  background:var(--card);border:1px solid var(--border);
-  border-radius:14px;padding:16px;
-  display:flex;align-items:center;gap:12px;transition:border-color .2s;
-}
+.stats-row{max-width:900px;margin:16px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;display:flex;align-items:center;gap:10px;transition:border-color .2s;}
 .stat-card:hover{border-color:var(--border2);}
-.stat-icon{font-size:1.5rem;}
-.stat-label{font-size:.7rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
-.stat-val{font-size:1.4rem;font-weight:800;line-height:1.1;margin-top:2px;}
+.stat-icon{font-size:1.4rem;}
+.stat-label{font-size:.68rem;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;}
+.stat-val{font-size:1.3rem;font-weight:800;line-height:1.1;margin-top:2px;}
+
+/* HINT */
+.hint-bar{max-width:900px;margin:12px auto 0;padding:0 24px;}
+.hint-inner{background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);border-radius:10px;padding:9px 14px;font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:8px;}
 
 /* SELECTION TOOLBAR */
-.select-toolbar{
-  max-width:900px;margin:16px auto 0;padding:0 24px;
-  display:none;
-}
+.select-toolbar{max-width:900px;margin:12px auto 0;padding:0 24px;display:none;}
 .select-toolbar.visible{display:block;}
-.toolbar-inner{
-  background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(59,130,246,.12));
-  border:1px solid rgba(168,85,247,.35);
-  border-radius:14px;padding:14px 18px;
-  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
-}
-.toolbar-inner .sel-info{flex:1;min-width:0;}
+.toolbar-inner{background:linear-gradient(135deg,rgba(168,85,247,.15),rgba(59,130,246,.12));border:1px solid rgba(168,85,247,.35);border-radius:14px;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
+.sel-info{flex:1;min-width:0;}
 .sel-title{font-size:.88rem;font-weight:700;color:var(--purple);}
 .sel-detail{font-size:.75rem;color:var(--muted);margin-top:2px;}
 .toolbar-btns{display:flex;gap:8px;}
-.tbtn{
-  font-size:.78rem;font-weight:700;padding:8px 16px;border-radius:8px;
-  border:none;cursor:pointer;font-family:var(--font);transition:all .15s;
-}
+.tbtn{font-size:.78rem;font-weight:700;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);transition:all .15s;}
 .tbtn-confirm{background:var(--gold);color:#000;}
 .tbtn-confirm:hover{background:var(--gold2);}
 .tbtn-clear{background:rgba(239,68,68,.14);color:var(--red);border:1px solid rgba(239,68,68,.28)!important;}
-.tbtn-clear:hover{background:rgba(239,68,68,.26);}
 
-/* HINT BAR */
-.hint-bar{
-  max-width:900px;margin:10px auto 0;padding:0 24px;
-}
-.hint-inner{
-  background:rgba(59,130,246,.07);border:1px solid rgba(59,130,246,.18);
-  border-radius:10px;padding:9px 14px;
-  font-size:.76rem;color:var(--muted);
-  display:flex;align-items:center;gap:8px;
-}
-
-/* MAIN */
-.main-wrap{max-width:900px;margin:16px auto 40px;padding:0 24px;}
+/* ROOM CARD */
+.main-wrap{max-width:900px;margin:14px auto 40px;padding:0 24px;}
 .room-card{background:var(--card);border:1px solid var(--border);border-radius:22px;overflow:hidden;}
-.room-header{
-  padding:22px 24px;
-  background:linear-gradient(135deg,#1e2d4a 0%,#192038 100%);
-  border-bottom:1px solid var(--border);
-  display:flex;align-items:center;gap:16px;
-}
-.room-icon{
-  width:48px;height:48px;border-radius:12px;
-  background:linear-gradient(135deg,var(--gold),var(--gold2));
-  display:flex;align-items:center;justify-content:center;font-size:1.4rem;
-  box-shadow:0 4px 16px rgba(245,197,66,.35);flex-shrink:0;
-}
-.room-title h2{font-size:1.05rem;font-weight:800;}
-.room-title p{font-size:.73rem;color:var(--muted);margin-top:3px;}
+.room-header{padding:20px 24px;background:linear-gradient(135deg,#1e2d4a 0%,#192038 100%);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:16px;}
+.room-icon{width:46px;height:46px;border-radius:12px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 4px 16px rgba(245,197,66,.35);flex-shrink:0;}
+.room-title h2{font-size:1rem;font-weight:800;}
+.room-title p{font-size:.72rem;color:var(--muted);margin-top:3px;}
 .room-badges{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .badge{font-size:.7rem;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid;white-space:nowrap;}
-.badge-cap  {background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:var(--blue);}
+.badge-cap{background:rgba(59,130,246,.12);border-color:rgba(59,130,246,.3);color:var(--blue);}
 .badge-avail{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
-.badge-busy {background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--red);}
+.badge-busy{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--red);}
 
 /* SLOTS */
-.slots-wrap{padding:18px;}
-.slots-grid{display:flex;flex-direction:column;gap:7px;max-height:540px;overflow-y:auto;padding-right:4px;}
+.slots-wrap{padding:16px;}
+.slots-grid{display:flex;flex-direction:column;gap:7px;max-height:520px;overflow-y:auto;padding-right:4px;}
 .slots-grid::-webkit-scrollbar{width:4px;}
 .slots-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-
-.slot{
-  display:flex;align-items:center;gap:12px;
-  padding:12px 15px;border-radius:12px;
-  border:1px solid var(--border);background:var(--bg2);
-  transition:all .18s;position:relative;
-}
+.slot{display:flex;align-items:center;gap:12px;padding:12px 15px;border-radius:12px;border:1px solid var(--border);background:var(--bg2);transition:all .18s;position:relative;}
 .slot.available{cursor:pointer;}
 .slot.available:hover{border-color:var(--gold);background:rgba(245,197,66,.04);transform:translateX(4px);}
 .slot.booked{background:rgba(239,68,68,.04);border-color:rgba(239,68,68,.18);}
-.slot.mine  {background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);}
-.slot.pending-cancel{background:rgba(245,197,66,.06)!important;border-color:rgba(245,197,66,.35)!important;}
-.slot.pending-cancel .slot-dot{background:var(--gold)!important;box-shadow:0 0 6px rgba(245,197,66,.5)!important;}
-
-/* SELECTED STATE */
-.slot.selected{
-  border-color:var(--purple)!important;
-  background:rgba(168,85,247,.08)!important;
-  transform:translateX(4px);
-}
+.slot.mine{background:rgba(34,197,94,.04);border-color:rgba(34,197,94,.2);}
+.slot.selected{border-color:var(--purple)!important;background:rgba(168,85,247,.08)!important;transform:translateX(4px);}
 .slot.selected .slot-dot{background:var(--purple)!important;box-shadow:0 0 8px rgba(168,85,247,.6)!important;}
+.slot.pending-cancel{background:rgba(245,197,66,.06)!important;border-color:rgba(245,197,66,.35)!important;}
+.slot.pending-cancel .slot-dot{background:var(--gold)!important;}
 .slot.sel-first{border-radius:12px 12px 4px 4px!important;}
 .slot.sel-middle{border-radius:4px!important;margin-top:-3px;margin-bottom:-3px;}
 .slot.sel-last{border-radius:4px 4px 12px 12px!important;}
 .slot.sel-first.sel-last{border-radius:12px!important;margin:0!important;}
-
-.sel-check{
-  position:absolute;right:14px;top:50%;transform:translateY(-50%);
-  width:20px;height:20px;border-radius:6px;
-  background:var(--purple);
-  display:flex;align-items:center;justify-content:center;
-  font-size:.7rem;color:#fff;font-weight:800;
-  box-shadow:0 2px 8px rgba(168,85,247,.5);
-}
-
+.sel-check{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:20px;height:20px;border-radius:6px;background:var(--purple);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:#fff;font-weight:800;box-shadow:0 2px 8px rgba(168,85,247,.5);}
 .slot-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .slot.available .slot-dot{background:var(--green);box-shadow:0 0 6px rgba(34,197,94,.5);}
 .slot.booked    .slot-dot{background:var(--red);}
 .slot.mine      .slot-dot{background:var(--green);}
-
 .slot-time{font-size:.78rem;font-weight:700;min-width:98px;color:var(--muted);font-variant-numeric:tabular-nums;flex-shrink:0;}
 .slot-info{flex:1;min-width:0;}
 .slot-who{font-size:.84rem;font-weight:700;}
@@ -298,137 +270,177 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 .slot-why{font-size:.73rem;color:var(--muted);}
 .slot-free{font-size:.8rem;color:var(--muted2);}
 .slot-duration{font-size:.7rem;color:var(--purple);font-weight:600;margin-top:2px;}
-
 .slot-actions{display:flex;gap:6px;flex-shrink:0;}
-.sbtn{
-  font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:7px;
-  border:none;cursor:pointer;font-family:var(--font);transition:all .15s;
-  text-transform:uppercase;letter-spacing:.04em;
-}
-.sbtn-book  {background:var(--gold);color:#000;}
+.sbtn{font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:7px;border:none;cursor:pointer;font-family:var(--font);transition:all .15s;text-transform:uppercase;letter-spacing:.04em;}
+.sbtn-book{background:var(--gold);color:#000;}
 .sbtn-book:hover{background:var(--gold2);}
 .sbtn-cancel{background:rgba(239,68,68,.14);color:var(--red);border:1px solid rgba(239,68,68,.28)!important;}
 .sbtn-cancel:hover{background:rgba(239,68,68,.26);}
-.sbtn-edit  {background:rgba(59,130,246,.14);color:var(--blue);border:1px solid rgba(59,130,246,.28)!important;}
+.sbtn-edit{background:rgba(59,130,246,.14);color:var(--blue);border:1px solid rgba(59,130,246,.28)!important;}
 .sbtn-edit:hover{background:rgba(59,130,246,.26);}
 .sbtn-pending{background:rgba(245,197,66,.12);color:var(--gold);border:1px solid rgba(245,197,66,.3)!important;opacity:.8;cursor:default!important;}
 
 /* OVERLAYS */
-.overlay{
-  display:none;position:fixed;inset:0;
-  background:rgba(0,0,0,.75);backdrop-filter:blur(8px);
-  z-index:300;align-items:center;justify-content:center;padding:16px;
-}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(8px);z-index:300;align-items:center;justify-content:center;padding:16px;}
 .overlay.open{display:flex;}
-.modal{
-  background:var(--card);border:1px solid var(--border2);
-  border-radius:24px;padding:32px;width:100%;max-width:440px;
-  box-shadow:0 40px 100px rgba(0,0,0,.55);
-  animation:pop .22s cubic-bezier(.34,1.56,.64,1);
-}
-@keyframes pop{from{opacity:0;transform:scale(.9) translateY(16px);}to{opacity:1;transform:scale(1) translateY(0);}}
-.modal-badge{
-  font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
-  padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;
-}
-.modal h3{font-size:1.3rem;font-weight:800;margin-bottom:4px;}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:30px;width:100%;max-width:440px;box-shadow:0 40px 100px rgba(0,0,0,.55);animation:pop .22s cubic-bezier(.34,1.56,.64,1);}
+.modal-badge{font-size:.68rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;}
+.modal h3{font-size:1.2rem;font-weight:800;margin-bottom:4px;}
 .modal .modal-sub{font-size:.8rem;color:var(--muted);margin-bottom:10px;}
-.duration-pills{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:20px;}
-.dpill{
-  font-size:.72rem;font-weight:700;padding:5px 12px;border-radius:20px;
-  border:1px solid var(--border2);color:var(--muted);cursor:pointer;
-  background:var(--bg2);transition:all .15s;
-}
-.dpill.active,.dpill:hover{background:var(--purple);color:#fff;border-color:var(--purple);}
-
-.fgroup{margin-bottom:15px;}
-.fgroup label{display:block;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:7px;}
-.fgroup input,.fgroup select{
-  width:100%;background:var(--bg2);border:1px solid var(--border2);
-  color:var(--text);padding:12px 14px;border-radius:11px;
-  font-size:.88rem;font-family:var(--font);outline:none;transition:border-color .2s;
-}
-.fgroup input:focus,.fgroup select:focus{border-color:var(--gold);}
-.fgroup select option{background:var(--card);}
-
-.booking-summary{
-  background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);
-  border-radius:10px;padding:12px 14px;margin-bottom:16px;
-  font-size:.8rem;color:var(--muted);
-}
+.booking-summary{background:rgba(168,85,247,.08);border:1px solid rgba(168,85,247,.25);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:.8rem;color:var(--muted);}
 .booking-summary strong{color:var(--purple);display:block;font-size:.85rem;margin-bottom:3px;}
-
-.modal-btns{display:flex;gap:10px;margin-top:22px;}
-.mbtn-primary{
-  flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));
-  color:#000;border:none;padding:13px;border-radius:11px;
-  font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:opacity .15s;
-}
+.modal-btns{display:flex;gap:10px;margin-top:20px;}
+.mbtn-primary{flex:1;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;border:none;padding:13px;border-radius:11px;font-weight:800;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:opacity .15s;}
 .mbtn-primary:hover{opacity:.88;}
-.mbtn-secondary{
-  flex:1;background:transparent;color:var(--muted);border:1px solid var(--border2);
-  padding:13px;border-radius:11px;font-weight:500;font-size:.88rem;
-  cursor:pointer;font-family:var(--font);transition:all .15s;
-}
-.mbtn-secondary:hover{color:var(--text);border-color:var(--border2);}
+.mbtn-secondary{flex:1;background:transparent;color:var(--muted);border:1px solid var(--border2);padding:13px;border-radius:11px;font-weight:500;font-size:.88rem;cursor:pointer;font-family:var(--font);transition:all .15s;}
+.mbtn-secondary:hover{color:var(--text);}
 
-/* ADMIN */
-.admin-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);
-  z-index:400;align-items:center;justify-content:center;padding:16px;
-}
+/* ADMIN OVERLAY */
+.admin-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);z-index:400;align-items:center;justify-content:center;padding:16px;}
 .admin-overlay.open{display:flex;}
-.admin-modal{
-  background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:30px;
-  width:100%;max-width:580px;max-height:88vh;overflow-y:auto;
-  box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .22s cubic-bezier(.34,1.56,.64,1);
-}
+.admin-modal{background:var(--card);border:1px solid var(--border2);border-radius:24px;padding:28px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto;box-shadow:0 40px 100px rgba(0,0,0,.6);animation:pop .22s cubic-bezier(.34,1.56,.64,1);}
 .admin-modal::-webkit-scrollbar{width:4px;}
 .admin-modal::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
-.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
-.admin-header h2{font-size:1.15rem;font-weight:800;}
-.admin-close-btn{
-  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);
-  color:var(--red);width:34px;height:34px;border-radius:9px;
-  cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;
-}
-.admin-date-info{font-size:.78rem;color:var(--muted);margin-bottom:18px;}
-.abi{
-  background:var(--bg2);border:1px solid var(--border);border-radius:13px;
-  padding:14px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px;
-}
+.admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.admin-header h2{font-size:1.1rem;font-weight:800;}
+.admin-close-btn{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.3);color:var(--red);width:34px;height:34px;border-radius:9px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.admin-tabs{display:flex;gap:4px;background:var(--bg2);border-radius:10px;padding:4px;margin-bottom:18px;}
+.admin-tab{flex:1;padding:8px;border-radius:8px;border:none;background:transparent;color:var(--muted);font-family:var(--font);font-size:.78rem;font-weight:600;cursor:pointer;transition:all .2s;text-align:center;}
+.admin-tab.active{background:var(--card2);color:var(--text);}
+.section-label{font-size:.72rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.abi{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px;}
 .abi-info{flex:1;min-width:0;}
 .abi-name{font-weight:700;font-size:.88rem;}
 .abi-dept{font-size:.68rem;background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.2);color:var(--blue);display:inline-block;padding:2px 8px;border-radius:20px;margin-top:4px;}
 .abi-meta{font-size:.74rem;color:var(--muted);margin-top:4px;}
 .abi-duration{font-size:.7rem;color:var(--purple);font-weight:600;margin-top:2px;}
-.abi-actions{display:flex;gap:6px;flex-shrink:0;margin-top:2px;}
-.no-bookings{text-align:center;padding:36px;color:var(--muted);font-size:.85rem;}
-.admin-login-wrap{text-align:center;}
-.admin-login-wrap .lock{font-size:3rem;margin-bottom:12px;}
-.admin-login-wrap h3{font-size:1.1rem;font-weight:800;margin-bottom:6px;}
-.admin-login-wrap p{font-size:.82rem;color:var(--muted);margin-bottom:22px;}
+.abi-actions{display:flex;gap:6px;flex-shrink:0;margin-top:2px;flex-wrap:wrap;}
+
+/* STAFF ITEMS */
+.staff-item{background:var(--bg2);border:1px solid var(--border);border-radius:13px;padding:14px 16px;margin-bottom:9px;display:flex;align-items:flex-start;gap:12px;}
+.staff-av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));color:#000;font-weight:800;font-size:.9rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.staff-info{flex:1;min-width:0;}
+.staff-name{font-weight:700;font-size:.88rem;}
+.staff-email{font-size:.74rem;color:var(--muted);margin-top:2px;}
+.staff-meta{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.staff-badge{font-size:.65rem;font-weight:700;padding:2px 8px;border-radius:20px;border:1px solid;display:inline-block;margin-top:4px;}
+.staff-badge.pending{background:rgba(245,197,66,.12);border-color:rgba(245,197,66,.3);color:var(--gold);}
+.staff-badge.approved{background:rgba(34,197,94,.12);border-color:rgba(34,197,94,.3);color:var(--green);}
+.staff-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap;}
+
+.no-items{text-align:center;padding:32px;color:var(--muted);font-size:.84rem;}
 
 /* LEGEND */
-.legend{max-width:900px;margin:0 auto 32px;padding:0 24px;display:flex;gap:20px;flex-wrap:wrap;}
-.leg-item{display:flex;align-items:center;gap:7px;font-size:.75rem;color:var(--muted);}
+.legend{max-width:900px;margin:0 auto 28px;padding:0 24px;display:flex;gap:18px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:7px;font-size:.74rem;color:var(--muted);}
 .leg-dot{width:8px;height:8px;border-radius:50%;}
-
-.footer{text-align:center;padding:22px;font-size:.72rem;color:var(--muted2);border-top:1px solid var(--border);}
+.footer{text-align:center;padding:20px;font-size:.7rem;color:var(--muted2);border-top:1px solid var(--border);}
 
 @media(max-width:520px){
-  .hero-inner{padding:20px 16px;}
-  .brand-logo{width:44px;height:44px;font-size:1.3rem;}
+  .hero-inner{padding:16px;}
+  .brand-logo{width:38px;height:38px;font-size:1.1rem;}
   .stats-row{gap:8px;}
-  .stat-card{padding:12px 10px;gap:8px;}
-  .stat-val{font-size:1.2rem;}
-  .main-wrap,.date-strip,.stats-row,.legend,.select-toolbar,.hint-bar{padding:0 14px;}
-  .slot-time{min-width:80px;}
+  .stat-card{padding:10px 8px;gap:8px;}
+  .stat-val{font-size:1.1rem;}
+  .main-wrap,.date-strip,.stats-row,.legend,.select-toolbar,.hint-bar{padding:0 12px;}
+  .slot-time{min-width:78px;}
   .dept-badge{display:none;}
+  .auth-box{padding:26px 20px;}
 }
 </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  AUTH SCREEN                               -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="auth-box" id="authBox">
+
+    <!-- LOGIN PANEL -->
+    <div id="loginPanel">
+      <div class="auth-logo">S</div>
+      <h2>SankenOverseas</h2>
+      <p class="auth-sub">Boardroom Booking System — Staff Login</p>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">Login</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">Register</button>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
+        <div class="fgroup">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="yourname@sankenoverseas.com" autocomplete="email">
+        </div>
+        <div class="fgroup">
+          <label>Password</label>
+          <input type="password" id="loginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+        </div>
+        <button class="auth-btn" onclick="doLogin()">🔑 Login</button>
+      </div>
+
+      <!-- REGISTER FORM -->
+      <div id="registerForm" style="display:none">
+        <div class="fgroup">
+          <label>Full Name</label>
+          <input type="text" id="regName" placeholder="e.g. Kasun Perera" maxlength="40">
+        </div>
+        <div class="fgroup">
+          <label>Work Email</label>
+          <input type="email" id="regEmail" placeholder="yourname@sankenoverseas.com">
+          <div class="hint">Use your SankenOverseas email</div>
+        </div>
+        <div class="fgroup">
+          <label>Employee ID</label>
+          <input type="text" id="regEmpId" placeholder="e.g. SKN-001" maxlength="20">
+        </div>
+        <div class="fgroup">
+          <label>Department</label>
+          <select id="regDept">
+            <option value="">— Select your department —</option>
+            <option>Administration</option>
+            <option>Finance &amp; Accounts</option>
+            <option>Human Resources</option>
+            <option>Sales &amp; Marketing</option>
+            <option>Operations</option>
+            <option>Information Technology</option>
+            <option>Procurement</option>
+            <option>Logistics</option>
+            <option>Legal &amp; Compliance</option>
+            <option>Management</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Password</label>
+          <input type="password" id="regPass" placeholder="Create a password (min 6 chars)" maxlength="50">
+        </div>
+        <button class="auth-btn" onclick="doRegister()">📝 Submit Registration</button>
+        <p style="font-size:.73rem;color:var(--muted);margin-top:12px;text-align:center;">
+          Your registration will be reviewed by the admin before access is granted.
+        </p>
+      </div>
+    </div>
+
+    <!-- PENDING APPROVAL PANEL -->
+    <div id="pendingPanel" style="display:none">
+      <div class="pending-box">
+        <div class="pending-icon">⏳</div>
+        <h3>Registration Pending</h3>
+        <p>Your account is awaiting admin approval. You will be able to log in once an administrator approves your registration.</p>
+        <div class="emp-card" id="pendingCard"></div>
+        <p style="font-size:.76rem;color:var(--muted);margin-bottom:16px;">Please contact the Administration Department if you need urgent access.</p>
+        <span class="logout-link" onclick="doLogout()">← Back to Login</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  MAIN APP SCREEN                           -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="appScreen">
 
 <!-- HERO -->
 <div class="hero">
@@ -442,11 +454,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
       </div>
     </div>
     <div class="hero-right">
-      <div class="user-pill">
-        <div class="user-avatar" id="avatarEl">?</div>
-        <input type="text" id="userInput" placeholder="Your name…" maxlength="30" autocomplete="off">
+      <div class="user-chip">
+        <div class="user-av" id="avatarEl">?</div>
+        <div class="uname" id="userNameDisplay">–</div>
       </div>
-      <button class="admin-btn" id="adminToggle" onclick="openAdminLogin()">⚙️ Admin</button>
+      <div class="hero-btns">
+        <button class="hbtn hbtn-admin" id="adminToggle" onclick="openAdminLogin()" style="display:none">⚙️ Admin</button>
+        <button class="hbtn hbtn-logout" onclick="doLogout()">Logout</button>
+      </div>
     </div>
   </div>
 </div>
@@ -467,25 +482,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 
 <!-- STATS -->
 <div class="stats-row">
-  <div class="stat-card">
-    <div class="stat-icon">📋</div>
-    <div><div class="stat-label">Total Slots</div><div class="stat-val" id="statTotal">20</div></div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon">✅</div>
-    <div><div class="stat-label">Available</div><div class="stat-val" id="statAvail" style="color:var(--green)">–</div></div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon">🔒</div>
-    <div><div class="stat-label">Booked</div><div class="stat-val" id="statBooked" style="color:var(--red)">–</div></div>
-  </div>
+  <div class="stat-card"><div class="stat-icon">📋</div><div><div class="stat-label">Total Slots</div><div class="stat-val" id="statTotal">20</div></div></div>
+  <div class="stat-card"><div class="stat-icon">✅</div><div><div class="stat-label">Available</div><div class="stat-val" id="statAvail" style="color:var(--green)">–</div></div></div>
+  <div class="stat-card"><div class="stat-icon">🔒</div><div><div class="stat-label">Booked</div><div class="stat-val" id="statBooked" style="color:var(--red)">–</div></div></div>
 </div>
 
-<!-- HINT BAR -->
+<!-- HINT -->
 <div class="hint-bar">
-  <div class="hint-inner">
-    💡 <span>Tap a slot to select it. Tap multiple <strong>consecutive</strong> available slots to book a longer session, then click <strong>Book Selected</strong>.</span>
-  </div>
+  <div class="hint-inner">💡 Tap a slot to select it. Tap multiple consecutive slots to book a longer session, then tap <strong>Book Selected</strong>.</div>
 </div>
 
 <!-- SELECTION TOOLBAR -->
@@ -493,7 +497,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   <div class="toolbar-inner">
     <div class="sel-info">
       <div class="sel-title" id="selTitle">0 slots selected</div>
-      <div class="sel-detail" id="selDetail">Select consecutive available slots</div>
+      <div class="sel-detail" id="selDetail"></div>
     </div>
     <div class="toolbar-btns">
       <button class="tbtn tbtn-clear" onclick="clearSelection()">✕ Clear</button>
@@ -507,18 +511,13 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   <div class="room-card">
     <div class="room-header">
       <div class="room-icon">🏛️</div>
-      <div class="room-title">
-        <h2>Boardroom</h2>
-        <p>1st Floor Meeting Room</p>
-      </div>
+      <div class="room-title"><h2>Boardroom</h2><p>1st Floor Meeting Room</p></div>
       <div class="room-badges">
         <span class="badge badge-cap">👥 8 People</span>
         <span class="badge" id="availBadge">– Available</span>
       </div>
     </div>
-    <div class="slots-wrap">
-      <div class="slots-grid" id="slotsList"></div>
-    </div>
+    <div class="slots-wrap"><div class="slots-grid" id="slotsList"></div></div>
   </div>
 </div>
 
@@ -533,6 +532,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 
 <div class="footer">© Copyright : Administration Department – Sanken Overseas Pvt Ltd · All rights reserved</div>
 
+</div><!-- end appScreen -->
+
 <!-- BOOK MODAL -->
 <div class="overlay" id="bookOverlay">
   <div class="modal">
@@ -540,31 +541,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
     <h3 id="bookTitle">Book Slot</h3>
     <div class="modal-sub" id="bookSub"></div>
     <div class="booking-summary" id="bookingSummary"></div>
-    <div class="fgroup">
-      <label>Your Full Name</label>
-      <input type="text" id="bName" placeholder="e.g. Kasun Perera" maxlength="40">
-    </div>
-    <div class="fgroup">
-      <label>Department</label>
-      <select id="bDept">
-        <option value="">— Select your department —</option>
-        <option>Administration</option>
-        <option>Finance &amp; Accounts</option>
-        <option>Human Resources</option>
-        <option>Sales &amp; Marketing</option>
-        <option>Operations</option>
-        <option>Information Technology</option>
-        <option>Procurement</option>
-        <option>Logistics</option>
-        <option>Legal &amp; Compliance</option>
-        <option>Management</option>
-        <option>Other</option>
-      </select>
-    </div>
-    <div class="fgroup">
-      <label>Meeting Purpose</label>
-      <input type="text" id="bPurpose" placeholder="e.g. Weekly sync, Client presentation…" maxlength="60">
-    </div>
+    <div class="fgroup"><label>Meeting Purpose</label><input type="text" id="bPurpose" placeholder="e.g. Weekly sync, Client presentation…" maxlength="60"></div>
     <div class="modal-btns">
       <button class="mbtn-secondary" onclick="closeBook()">Cancel</button>
       <button class="mbtn-primary" onclick="confirmBook()">🔒 Confirm Booking</button>
@@ -578,31 +555,18 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
     <div class="modal-badge" style="background:rgba(59,130,246,.15);color:var(--blue);border:1px solid rgba(59,130,246,.3)">✏️ Edit Booking</div>
     <h3 id="editTitle">Edit Slot</h3>
     <div class="modal-sub" id="editSub"></div>
-    <div class="fgroup">
-      <label>Name</label>
-      <input type="text" id="eName" maxlength="40">
-    </div>
-    <div class="fgroup">
-      <label>Department</label>
+    <div class="fgroup"><label>Name</label><input type="text" id="eName" maxlength="40"></div>
+    <div class="fgroup"><label>Department</label>
       <select id="eDept">
-        <option value="">— Select department —</option>
-        <option>Administration</option>
-        <option>Finance &amp; Accounts</option>
-        <option>Human Resources</option>
-        <option>Sales &amp; Marketing</option>
-        <option>Operations</option>
-        <option>Information Technology</option>
-        <option>Procurement</option>
-        <option>Logistics</option>
-        <option>Legal &amp; Compliance</option>
-        <option>Management</option>
-        <option>Other</option>
+        <option value="">— Select —</option>
+        <option>Administration</option><option>Finance &amp; Accounts</option>
+        <option>Human Resources</option><option>Sales &amp; Marketing</option>
+        <option>Operations</option><option>Information Technology</option>
+        <option>Procurement</option><option>Logistics</option>
+        <option>Legal &amp; Compliance</option><option>Management</option>
       </select>
     </div>
-    <div class="fgroup">
-      <label>Meeting Purpose</label>
-      <input type="text" id="ePurpose" maxlength="60">
-    </div>
+    <div class="fgroup"><label>Meeting Purpose</label><input type="text" id="ePurpose" maxlength="60"></div>
     <div class="modal-btns">
       <button class="mbtn-secondary" onclick="closeEdit()">Cancel</button>
       <button class="mbtn-primary" onclick="confirmEdit()">💾 Save Changes</button>
@@ -613,96 +577,258 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
 <!-- ADMIN OVERLAY -->
 <div class="admin-overlay" id="adminOverlay">
   <div class="admin-modal">
-    <div id="adminLoginWrap" class="admin-login-wrap">
-      <div class="lock">🔐</div>
-      <h3>Admin Access</h3>
-      <p>Enter the administrator password to manage all bookings.</p>
-      <div class="fgroup">
-        <label>Password</label>
-        <input type="password" id="adminPassInput" placeholder="Enter password…"
-          onkeydown="if(event.key==='Enter')verifyAdmin()">
-      </div>
-      <div class="modal-btns">
-        <button class="mbtn-secondary" onclick="closeAdmin()">Cancel</button>
-        <button class="mbtn-primary" onclick="verifyAdmin()">🔓 Login</button>
-      </div>
+    <div id="adminLoginWrap">
+      <div class="admin-header"><h2>🔐 Admin Login</h2><button class="admin-close-btn" onclick="closeAdmin()">✕</button></div>
+      <div class="fgroup"><label>Admin Password</label><input type="password" id="adminPassInput" placeholder="Enter password…" onkeydown="if(event.key==='Enter')verifyAdmin()"></div>
+      <div class="modal-btns"><button class="mbtn-secondary" onclick="closeAdmin()">Cancel</button><button class="mbtn-primary" onclick="verifyAdmin()">🔓 Login</button></div>
     </div>
     <div id="adminPanelWrap" style="display:none">
       <div class="admin-header">
-        <h2>⚙️ Admin — All Bookings</h2>
+        <h2>⚙️ Admin Panel</h2>
         <button class="admin-close-btn" onclick="closeAdmin()">✕</button>
       </div>
-      <div class="admin-date-info" id="adminDateInfo"></div>
-      <div id="adminList"></div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('bookings')">📅 Bookings</button>
+        <button class="admin-tab" onclick="switchAdminTab('staff')">👥 Staff</button>
+        <button class="admin-tab" onclick="switchAdminTab('pending')">⏳ Approvals <span id="pendingBadge"></span></button>
+      </div>
+      <div id="adminTabContent"></div>
     </div>
   </div>
 </div>
 
+<!-- PWA Install Banner -->
+<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:500;
+  background:linear-gradient(135deg,#1e2d4a,#192038);border:1px solid rgba(245,197,66,.4);border-radius:16px;
+  padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.5);
+  align-items:center;gap:14px;max-width:360px;width:calc(100% - 32px);animation:slideUp .3s ease;">
+  <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f5c542,#e8a820);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#000;flex-shrink:0;">S</div>
+  <div style="flex:1;min-width:0;">
+    <div style="font-size:.82rem;font-weight:700;color:#f0f2f8;">Add to Home Screen</div>
+    <div style="font-size:.72rem;color:#7b8ab8;margin-top:2px;">Install Sanken Booking as an app</div>
+  </div>
+  <div style="display:flex;gap:8px;flex-shrink:0;">
+    <button onclick="dismissInstall()" style="background:transparent;border:1px solid #2d3650;color:#7b8ab8;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.75rem;font-family:'Plus Jakarta Sans',sans-serif;">Later</button>
+    <button onclick="installApp()" style="background:linear-gradient(135deg,#f5c542,#e8a820);border:none;color:#000;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">Install</button>
+  </div>
+</div>
+<style>@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}</style>
+
 <script>
 // ─── Config ───────────────────────────────────────────
-const ADMIN_PASSWORD = 'sanken2024'; // ← change this!
-
-const SLOTS = [];
-for(let h=8;h<18;h++){
-  SLOTS.push(`${String(h).padStart(2,'0')}:00`);
-  SLOTS.push(`${String(h).padStart(2,'0')}:30`);
-}
+const ADMIN_PASSWORD = 'sanken2024';
+const SLOTS=[];
+for(let h=8;h<18;h++){SLOTS.push(`${String(h).padStart(2,'0')}:00`);SLOTS.push(`${String(h).padStart(2,'0')}:30`);}
 
 // ─── State ────────────────────────────────────────────
-let currentDate  = today();
-let userName     = '';
-let bookings     = {};
-let firebaseOK   = false;
-let isAdmin      = false;
-let selectedSlots= []; // array of time strings e.g. ['09:00','09:30','10:00']
-let pendingSlots = []; // slots about to be booked
-let editKey      = null;
-let unsub        = null;
+let currentDate=today();
+let currentUser=null; // { uid, name, email, dept, empId, approved, isAdmin }
+let bookings={};
+let staffList={};
+let firebaseOK=false;
+let isAdmin=false;
+let selectedSlots=[];
+let pendingSlots=[];
+let editKey=null;
+let unsub=null;
+let unsubStaff=null;
+let activeAdminTab='bookings';
 
 // ─── Utils ────────────────────────────────────────────
-function today(){ const d=new Date();d.setHours(0,0,0,0);return d; }
-function dateKey(d){ return d.toISOString().slice(0,10); }
-function slotKey(time){ return `room1__${dateKey(currentDate)}__${time.replace(':','h')}`; }
-function nextTime(t){ const[h,m]=t.split(':').map(Number);const tot=h*60+m+30;return `${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`; }
-function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function isToday(d){ return d.getTime()===today().getTime(); }
-function slotIndex(t){ return SLOTS.indexOf(t); }
-
-function durationLabel(slots){
-  const mins = slots.length * 30;
-  if(mins < 60) return `${mins} min`;
-  const h=Math.floor(mins/60), m=mins%60;
-  return m ? `${h}h ${m}min` : `${h} hour${h>1?'s':''}`;
-}
+function today(){const d=new Date();d.setHours(0,0,0,0);return d;}
+function dateKey(d){return d.toISOString().slice(0,10);}
+function slotKey(time){return `room1__${dateKey(currentDate)}__${time.replace(':','h')}`;}
+function nextTime(t){const[h,m]=t.split(':').map(Number);const tot=h*60+m+30;return `${String(Math.floor(tot/60)).padStart(2,'0')}:${String(tot%60).padStart(2,'0')}`;}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function isToday(d){return d.getTime()===today().getTime();}
+function slotIndex(t){return SLOTS.indexOf(t);}
+function durationLabel(slots){const mins=slots.length*30;if(mins<60)return`${mins} min`;const h=Math.floor(mins/60),m=mins%60;return m?`${h}h ${m}min`:`${h} hour${h>1?'s':''}`;}
+function emailToUid(email){return email.replace(/\./g,'_').replace(/@/g,'__at__');}
+function hashPass(p){let h=0;for(let i=0;i<p.length;i++){h=(Math.imul(31,h)+p.charCodeAt(i))|0;}return Math.abs(h).toString(36);}
 
 // ─── Firebase ─────────────────────────────────────────
 window.addEventListener('firebase-ready',()=>{
   firebaseOK=true;
-  document.getElementById('liveIndicator').textContent='● Live sync active';
-  subscribeDate();
-  showStatus('Connected — real-time sync active ✓','info');
-  setTimeout(hideStatus,3500);
+  // Check saved session
+  const saved=localStorage.getItem('sanken_user');
+  if(saved){
+    const u=JSON.parse(saved);
+    verifyStoredSession(u);
+  }
 });
 
+async function verifyStoredSession(u){
+  const{db,ref,get}=window._fb;
+  try{
+    const snap=await get(ref(db,`staff/${u.uid}`));
+    if(snap.exists()){
+      const data=snap.val();
+      if(data.approved){
+        currentUser={...data,uid:u.uid};
+        enterApp();
+      } else {
+        showPendingPanel(data);
+      }
+    } else {
+      showAuthScreen();
+    }
+  } catch(e){ showAuthScreen(); }
+}
+
+// ─── AUTH: Register ───────────────────────────────────
+function switchAuthTab(tab){
+  document.getElementById('loginForm').style.display=tab==='login'?'block':'none';
+  document.getElementById('registerForm').style.display=tab==='register'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>{
+    t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='register'&&i===1));
+  });
+}
+
+async function doRegister(){
+  if(!firebaseOK){alert('Connecting to server, please wait…');return;}
+  const name=document.getElementById('regName').value.trim();
+  const email=document.getElementById('regEmail').value.trim().toLowerCase();
+  const empId=document.getElementById('regEmpId').value.trim().toUpperCase();
+  const dept=document.getElementById('regDept').value;
+  const pass=document.getElementById('regPass').value;
+  if(!name||!email||!empId||!dept||!pass){showAuthStatus('Please fill in all fields','err');return;}
+  if(pass.length<6){showAuthStatus('Password must be at least 6 characters','err');return;}
+  if(!email.includes('@')){showAuthStatus('Please enter a valid email','err');return;}
+
+  const uid=emailToUid(email);
+  const{db,ref,get,set}=window._fb;
+  try{
+    const snap=await get(ref(db,`staff/${uid}`));
+    if(snap.exists()){showAuthStatus('This email is already registered','err');return;}
+    await set(ref(db,`staff/${uid}`),{
+      name,email,empId,dept,
+      passHash:hashPass(pass),
+      approved:false,
+      registeredAt:Date.now()
+    });
+    const userData={name,email,empId,dept,approved:false};
+    showPendingPanel(userData);
+    showAuthStatus('Registration submitted! Awaiting admin approval.','ok');
+  } catch(e){showAuthStatus('Registration failed. Please try again.','err');}
+}
+
+// ─── AUTH: Login ──────────────────────────────────────
+async function doLogin(){
+  if(!firebaseOK){alert('Connecting to server, please wait…');return;}
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass=document.getElementById('loginPass').value;
+  if(!email||!pass){showAuthStatus('Please enter your email and password','err');return;}
+
+  // Check admin superlogin
+  if(email==='admin' && pass===ADMIN_PASSWORD){
+    currentUser={uid:'admin',name:'Administrator',email:'admin',dept:'Administration',approved:true,isAdmin:true};
+    isAdmin=true;
+    localStorage.setItem('sanken_user',JSON.stringify({uid:'admin'}));
+    enterApp();return;
+  }
+
+  const uid=emailToUid(email);
+  const{db,ref,get}=window._fb;
+  try{
+    const snap=await get(ref(db,`staff/${uid}`));
+    if(!snap.exists()){showAuthStatus('Email not found. Please register first.','err');return;}
+    const data=snap.val();
+    if(data.passHash!==hashPass(pass)){showAuthStatus('Incorrect password','err');return;}
+    if(!data.approved){showPendingPanel(data);return;}
+    currentUser={...data,uid};
+    localStorage.setItem('sanken_user',JSON.stringify({uid}));
+    enterApp();
+  } catch(e){showAuthStatus('Login failed. Please try again.','err');}
+}
+
+// ─── Auth helpers ─────────────────────────────────────
+function showAuthStatus(msg,type){
+  let el=document.getElementById('authStatus');
+  if(!el){el=document.createElement('div');el.id='authStatus';el.style.cssText='margin-top:12px;padding:9px 14px;border-radius:9px;font-size:.8rem;font-weight:600;';document.querySelector('.auth-box').appendChild(el);}
+  el.className='status-inner '+type;el.textContent=msg;el.style.display='flex';
+  setTimeout(()=>{if(el)el.style.display='none';},4000);
+}
+
+function showPendingPanel(data){
+  document.getElementById('loginPanel').style.display='none';
+  document.getElementById('pendingPanel').style.display='block';
+  document.getElementById('pendingCard').innerHTML=`
+    <div class="ec-name">${esc(data.name)}</div>
+    <div class="ec-meta">${esc(data.email)} · ${esc(data.empId||'')} · ${esc(data.dept)}</div>`;
+}
+
+function showAuthScreen(){
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('loginPanel').style.display='block';
+  document.getElementById('pendingPanel').style.display='none';
+}
+
+// ─── Enter App ────────────────────────────────────────
+function enterApp(){
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('appScreen').style.display='block';
+
+  // Set user display
+  document.getElementById('userNameDisplay').textContent=currentUser.name;
+  document.getElementById('avatarEl').textContent=currentUser.name[0].toUpperCase();
+
+  // Admin button
+  if(currentUser.isAdmin||isAdmin){
+    isAdmin=true;
+    document.getElementById('adminToggle').style.display='block';
+    document.getElementById('adminToggle').classList.add('active');
+  }
+
+  document.getElementById('liveIndicator').textContent='● Live sync active';
+  subscribeDate();
+  subscribeStaff();
+  showStatus(`Welcome back, ${currentUser.name}! 👋`,'ok');
+  setTimeout(hideStatus,3000);
+}
+
+function doLogout(){
+  localStorage.removeItem('sanken_user');
+  currentUser=null;isAdmin=false;
+  if(unsub)unsub();if(unsubStaff)unsubStaff();
+  bookings={};staffList={};selectedSlots=[];
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginPass').value='';
+  showAuthScreen();
+}
+
+// ─── Firebase data ────────────────────────────────────
 function subscribeDate(){
   if(!firebaseOK)return;
   const{db,ref,onValue}=window._fb;
   if(unsub)unsub();
-  unsub=onValue(ref(db,`bookings/${dateKey(currentDate)}`),snap=>{
-    bookings=snap.val()||{};
-    render();
-  });
+  unsub=onValue(ref(db,`bookings/${dateKey(currentDate)}`),snap=>{bookings=snap.val()||{};render();});
+}
+
+function subscribeStaff(){
+  if(!firebaseOK||!isAdmin)return;
+  const{db,ref,onValue}=window._fb;
+  if(unsubStaff)unsubStaff();
+  unsubStaff=onValue(ref(db,'staff'),snap=>{staffList=snap.val()||{};updatePendingBadge();});
+}
+
+function updatePendingBadge(){
+  const count=Object.values(staffList).filter(s=>!s.approved).length;
+  const el=document.getElementById('pendingBadge');
+  if(el) el.textContent=count>0?` (${count})`:'';
+  const btn=document.getElementById('adminToggle');
+  if(btn&&count>0) btn.textContent=`⚙️ Admin ⚠️${count}`;
+  else if(btn) btn.textContent='⚙️ Admin';
 }
 
 async function fbSet(key,data){
-  if(!firebaseOK){const b=JSON.parse(localStorage.getItem('mb')||'{}');b[key]=data;localStorage.setItem('mb',JSON.stringify(b));bookings=b;render();return;}
+  if(!firebaseOK)return;
   const{db,ref,set}=window._fb;
   const[,date]=key.split('__');
   await set(ref(db,`bookings/${date}/${key}`),data);
 }
-
 async function fbRemove(key){
-  if(!firebaseOK){const b=JSON.parse(localStorage.getItem('mb')||'{}');delete b[key];localStorage.setItem('mb',JSON.stringify(b));bookings=b;render();return;}
+  if(!firebaseOK)return;
   const{db,ref,remove}=window._fb;
   const[,date]=key.split('__');
   await remove(ref(db,`bookings/${date}/${key}`));
@@ -710,51 +836,33 @@ async function fbRemove(key){
 
 // ─── Render ───────────────────────────────────────────
 function render(){
+  if(!currentUser)return;
   const opts={weekday:'long',year:'numeric',month:'long',day:'numeric'};
-  document.getElementById('dateMain').innerHTML=
-    currentDate.toLocaleDateString('en-US',opts)+
-    (isToday(currentDate)?'<span class="today-tag">Today</span>':'');
-  document.getElementById('dateSub').textContent=
-    isToday(currentDate)?'Showing live availability for today':'Showing availability for selected date';
+  document.getElementById('dateMain').innerHTML=currentDate.toLocaleDateString('en-US',opts)+(isToday(currentDate)?'<span class="today-tag">Today</span>':'');
+  document.getElementById('dateSub').textContent=isToday(currentDate)?'Showing live availability for today':'Showing availability for selected date';
 
   const bookedKeys=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`));
   const booked=bookedKeys.length;
   const avail=SLOTS.length-booked;
-  const pendingCount=bookedKeys.filter(k=>bookings[k]&&bookings[k].cancelRequested).length;
   document.getElementById('statAvail').textContent=avail;
   document.getElementById('statBooked').textContent=booked;
-  // Show pending badge on admin button if any
-  const adminBtn=document.getElementById('adminToggle');
-  if(pendingCount>0&&isAdmin){
-    adminBtn.textContent=`⚙️ Admin (${pendingCount} ⚠️)`;
-  } else if(pendingCount>0){
-    adminBtn.textContent=`⚙️ Admin ⚠️`;
-    adminBtn.style.borderColor='var(--gold)';adminBtn.style.color='var(--gold)';
-  } else {
-    adminBtn.textContent='⚙️ Admin';
-    adminBtn.style.borderColor='';adminBtn.style.color='';
-  }
   const badge=document.getElementById('availBadge');
   badge.textContent=`${avail} Available`;
   badge.className='badge '+(avail>0?'badge-avail':'badge-busy');
 
-  // Slots
   const list=document.getElementById('slotsList');
   list.innerHTML='';
-  SLOTS.forEach((time,idx)=>{
+  SLOTS.forEach(time=>{
     const key=slotKey(time);
     const end=nextTime(time);
     const bk=bookings[key];
-    const mine=bk&&bk.name===userName&&userName.trim()!=='';
+    const mine=bk&&bk.userId===currentUser.uid;
     const isSelected=selectedSlots.includes(time);
     let cls=bk?(mine?'mine':'booked'):'available';
     if(bk&&bk.cancelRequested) cls='mine pending-cancel';
     if(isSelected) cls+=' selected';
-
-    // selection position styling
     if(isSelected){
-      const first=selectedSlots[0]===time;
-      const last=selectedSlots[selectedSlots.length-1]===time;
+      const first=selectedSlots[0]===time,last=selectedSlots[selectedSlots.length-1]===time;
       if(selectedSlots.length===1) cls+=' sel-first sel-last';
       else if(first) cls+=' sel-first';
       else if(last) cls+=' sel-last';
@@ -774,152 +882,95 @@ function render(){
           ${bk.dept?`<span class="dept-badge">${esc(bk.dept)}</span>`:''}
           <span class="slot-why">${esc(bk.purpose)}</span>
         </div>
-        <div class="slot-duration">⏱ ${dur}${bk.cancelRequested?` &nbsp;<span style="color:var(--gold);font-size:.68rem;font-weight:700;">⚠️ Cancel Requested</span>`:''}</div>
+        <div class="slot-duration">⏱ ${dur}${bk.cancelRequested?' &nbsp;<span style="color:var(--gold);font-size:.68rem;font-weight:700;">⚠️ Cancel Requested</span>':''}</div>
       </div>`;
       if(mine){
-        if(bk.cancelRequested){
-          actions+=`<button class="sbtn sbtn-pending" onclick="event.stopPropagation();" disabled>⏳ Pending…</button>`;
-        } else {
-          actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();requestCancel('${key}')">Request Cancel</button>`;
-        }
+        if(bk.cancelRequested) actions+=`<button class="sbtn sbtn-pending" disabled>⏳ Pending…</button>`;
+        else actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();requestCancel('${key}')">Request Cancel</button>`;
       }
       if(isAdmin){
         actions+=`<button class="sbtn sbtn-edit" onclick="event.stopPropagation();openEdit('${key}')">Edit</button>`;
         actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();adminDel('${key}')">Del</button>`;
       }
     } else {
-      if(isSelected){
-        info=`<div class="slot-info"><span style="font-size:.8rem;color:var(--purple);font-weight:600;">Selected ✓</span></div>`;
-      } else {
-        info=`<div class="slot-info"><span class="slot-free">Tap to select</span></div>`;
-      }
+      info=isSelected
+        ?`<div class="slot-info"><span style="font-size:.8rem;color:var(--purple);font-weight:600;">Selected ✓</span></div>`
+        :`<div class="slot-info"><span class="slot-free">Tap to select</span></div>`;
     }
-
     const checkEl=isSelected?`<div class="sel-check">${selectedSlots.indexOf(time)+1}</div>`:'';
-
-    div.innerHTML=`
-      <div class="slot-dot"></div>
-      <div class="slot-time">${time} – ${end}</div>
-      ${info}
-      <div class="slot-actions">${actions}</div>
-      ${checkEl}`;
+    div.innerHTML=`<div class="slot-dot"></div><div class="slot-time">${time} – ${end}</div>${info}<div class="slot-actions">${actions}</div>${checkEl}`;
     list.appendChild(div);
   });
-
   updateToolbar();
 }
 
-// ─── Multi-slot selection ─────────────────────────────
+// ─── Slot selection ───────────────────────────────────
 function toggleSlot(time){
-  if(!userName.trim()){
-    showStatus('Please enter your name at the top first','err');
-    document.getElementById('userInput').focus();return;
-  }
   const key=slotKey(time);
-  if(bookings[key]) return; // already booked
-
+  if(bookings[key])return;
   if(selectedSlots.includes(time)){
-    // deselect — remove this and everything after
-    const idx=selectedSlots.indexOf(time);
-    selectedSlots=selectedSlots.slice(0,idx);
+    selectedSlots=selectedSlots.slice(0,selectedSlots.indexOf(time));
   } else {
-    if(selectedSlots.length===0){
-      selectedSlots=[time];
-    } else {
-      // must be consecutive to last selected
-      const lastTime=selectedSlots[selectedSlots.length-1];
-      const lastIdx=slotIndex(lastTime);
-      const thisIdx=slotIndex(time);
-      if(thisIdx===lastIdx+1){
-        // check no booked slots in between
-        selectedSlots.push(time);
-      } else {
-        // start fresh selection
-        selectedSlots=[time];
-        showStatus('Started new selection — slots must be consecutive','info');
-        setTimeout(hideStatus,2500);
-      }
+    if(selectedSlots.length===0){selectedSlots=[time];}
+    else{
+      const lastIdx=slotIndex(selectedSlots[selectedSlots.length-1]);
+      if(slotIndex(time)===lastIdx+1) selectedSlots.push(time);
+      else{selectedSlots=[time];showStatus('Started new selection — slots must be consecutive','info');setTimeout(hideStatus,2500);}
     }
   }
   render();
 }
 
 function updateToolbar(){
-  const toolbar=document.getElementById('selectToolbar');
-  if(selectedSlots.length===0){toolbar.classList.remove('visible');return;}
-  toolbar.classList.add('visible');
-  const first=selectedSlots[0];
-  const last=selectedSlots[selectedSlots.length-1];
-  const endTime=nextTime(last);
-  document.getElementById('selTitle').textContent=
-    `${selectedSlots.length} slot${selectedSlots.length>1?'s':''} selected — ${durationLabel(selectedSlots)}`;
-  document.getElementById('selDetail').textContent=
-    `${first} – ${endTime} · Click "Book Selected" to confirm`;
+  const tb=document.getElementById('selectToolbar');
+  if(selectedSlots.length===0){tb.classList.remove('visible');return;}
+  tb.classList.add('visible');
+  const first=selectedSlots[0],last=selectedSlots[selectedSlots.length-1];
+  document.getElementById('selTitle').textContent=`${selectedSlots.length} slot${selectedSlots.length>1?'s':''} selected — ${durationLabel(selectedSlots)}`;
+  document.getElementById('selDetail').textContent=`${first} – ${nextTime(last)} · Tap "Book Selected" to confirm`;
 }
 
 function clearSelection(){selectedSlots=[];render();}
 
+// ─── Book modal ───────────────────────────────────────
 function openBookFromSelection(){
   if(selectedSlots.length===0)return;
   pendingSlots=[...selectedSlots];
-  const first=pendingSlots[0];
-  const last=pendingSlots[pendingSlots.length-1];
-  const endTime=nextTime(last);
-  document.getElementById('bookTitle').textContent=`${first} – ${endTime}`;
-  document.getElementById('bookSub').textContent=
-    currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('bookingSummary').innerHTML=
-    `<strong>📅 ${durationLabel(pendingSlots)} booking</strong>
-     ${pendingSlots.length} slot${pendingSlots.length>1?'s':''}: ${first} → ${endTime}`;
-  document.getElementById('bName').value=userName;
-  document.getElementById('bDept').value='';
+  const first=pendingSlots[0],last=pendingSlots[pendingSlots.length-1];
+  document.getElementById('bookTitle').textContent=`${first} – ${nextTime(last)}`;
+  document.getElementById('bookSub').textContent=currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('bookingSummary').innerHTML=`<strong>📅 ${durationLabel(pendingSlots)} booking</strong>${pendingSlots.length} slot${pendingSlots.length>1?'s':''}: ${first} → ${nextTime(last)}`;
   document.getElementById('bPurpose').value='';
   document.getElementById('bookOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('bDept').focus(),120);
+  setTimeout(()=>document.getElementById('bPurpose').focus(),120);
 }
-
 function closeBook(){document.getElementById('bookOverlay').classList.remove('open');pendingSlots=[];}
 
 async function confirmBook(){
-  const name=document.getElementById('bName').value.trim();
-  const dept=document.getElementById('bDept').value;
   const purpose=document.getElementById('bPurpose').value.trim();
-  if(!name){showStatus('Please enter your name','err');return;}
-  if(!dept){showStatus('Please select your department','err');return;}
   if(!purpose){showStatus('Please enter the meeting purpose','err');return;}
-  if(pendingSlots.length===0){showStatus('No slots selected','err');return;}
-
-  // Check none got booked meanwhile
   for(const t of pendingSlots){
-    if(bookings[slotKey(t)]){showStatus(`Slot ${t} was just taken! Clear and try again.`,'err');closeBook();clearSelection();return;}
+    if(bookings[slotKey(t)]){showStatus(`Slot ${t} was just taken! Please try again.`,'err');closeBook();clearSelection();return;}
   }
-
-  userName=name;
-  document.getElementById('userInput').value=name;
-  updateAvatar();
-
   const bookedAt=Date.now();
   const groupId=`grp_${bookedAt}`;
   for(const t of pendingSlots){
-    await fbSet(slotKey(t),{name,dept,purpose,bookedAt,slots:pendingSlots,groupId});
+    await fbSet(slotKey(t),{
+      name:currentUser.name,dept:currentUser.dept,purpose,
+      userId:currentUser.uid,bookedAt,slots:pendingSlots,groupId
+    });
   }
-
-  clearSelection();
-  closeBook();
-  showStatus(`✅ Boardroom booked: ${durationLabel(pendingSlots)} (${pendingSlots.length} slot${pendingSlots.length>1?'s':''})!`,'ok');
-  setTimeout(hideStatus,4000);
+  clearSelection();closeBook();
+  showStatus(`✅ Booked ${durationLabel(pendingSlots)}!`,'ok');
+  setTimeout(hideStatus,3500);
 }
 
-// ─── Request Cancel (user → pending admin approval) ───
+// ─── Request cancel ───────────────────────────────────
 async function requestCancel(key){
   const bk=bookings[key];if(!bk)return;
   const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-  const dur=durationLabel(slots);
-  if(!confirm(`Request cancellation of your ${dur} booking?\n\nAn admin will review and approve it.`))return;
-  for(const t of slots){
-    const k=slotKey(t);
-    if(bookings[k]) await fbSet(k,{...bookings[k],cancelRequested:true,cancelRequestedAt:Date.now()});
-  }
+  if(!confirm(`Request cancellation of your ${durationLabel(slots)} booking?\nAdmin will review and approve.`))return;
+  for(const t of slots){const k=slotKey(t);if(bookings[k]) await fbSet(k,{...bookings[k],cancelRequested:true,cancelRequestedAt:Date.now()});}
   showStatus('⏳ Cancellation request sent — awaiting admin approval','info');
   setTimeout(hideStatus,4000);
 }
@@ -938,68 +989,42 @@ function openEdit(key){
   document.getElementById('editOverlay').classList.add('open');
 }
 function closeEdit(){document.getElementById('editOverlay').classList.remove('open');editKey=null;}
-
 async function confirmEdit(){
   const name=document.getElementById('eName').value.trim();
   const dept=document.getElementById('eDept').value;
   const purpose=document.getElementById('ePurpose').value.trim();
-  if(!name||!purpose){showStatus('Name and purpose are required','err');return;}
+  if(!name||!purpose){showStatus('Name and purpose required','err');return;}
   const ex=bookings[editKey];
   const slots=ex.slots||[editKey.split('__')[2].replace('h',':')];
-  for(const t of slots){
-    const k=slotKey(t);
-    if(bookings[k]) await fbSet(k,{...bookings[k],name,dept,purpose});
-  }
-  closeEdit();
-  showStatus('✅ Booking updated','ok');
-  setTimeout(hideStatus,2500);
+  for(const t of slots){const k=slotKey(t);if(bookings[k]) await fbSet(k,{...bookings[k],name,dept,purpose});}
+  closeEdit();showStatus('✅ Booking updated','ok');setTimeout(hideStatus,2500);
 }
 
-// ─── Admin approve/reject cancel ──────────────────────
-async function approveCancel(key){
-  const bk=bookings[key];if(!bk)return;
-  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-  if(!confirm(`Approve cancellation for ${bk.name} (${durationLabel(slots)})?`))return;
-  for(const t of slots){await fbRemove(slotKey(t));}
-  renderAdminPanel();
-  render();
-  showStatus(`✅ Cancellation approved — slot freed`,'ok');
-  setTimeout(hideStatus,3000);
-}
-
-async function rejectCancel(key){
-  const bk=bookings[key];if(!bk)return;
-  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-  if(!confirm(`Reject cancellation request for ${bk.name}?\nBooking will remain active.`))return;
-  for(const t of slots){
-    const k=slotKey(t);
-    if(bookings[k]){
-      const updated={...bookings[k]};
-      delete updated.cancelRequested;
-      delete updated.cancelRequestedAt;
-      await fbSet(k,updated);
-    }
-  }
-  renderAdminPanel();
-  render();
-  showStatus(`Cancellation request rejected — booking remains active`,'info');
-  setTimeout(hideStatus,3000);
-}
-
-// ─── Admin del ────────────────────────────────────────
+// ─── Admin del / approve ──────────────────────────────
 async function adminDel(key){
   const bk=bookings[key];if(!bk)return;
   const slots=bk.slots||[key.split('__')[2].replace('h',':')];
   if(!confirm(`Delete this ${durationLabel(slots)} booking?`))return;
-  for(const t of slots){await fbRemove(slotKey(t));}
-  renderAdminPanel();
-  showStatus('Booking deleted','info');
-  setTimeout(hideStatus,2500);
+  for(const t of slots) await fbRemove(slotKey(t));
+  renderAdminTab();showStatus('Booking deleted','info');setTimeout(hideStatus,2500);
+}
+async function approveCancel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  if(!confirm(`Approve cancellation for ${bk.name}?`))return;
+  for(const t of slots) await fbRemove(slotKey(t));
+  renderAdminTab();showStatus('✅ Cancellation approved','ok');setTimeout(hideStatus,3000);
+}
+async function rejectCancel(key){
+  const bk=bookings[key];if(!bk)return;
+  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
+  for(const t of slots){const k=slotKey(t);if(bookings[k]){const u={...bookings[k]};delete u.cancelRequested;delete u.cancelRequestedAt;await fbSet(k,u);}}
+  renderAdminTab();showStatus('Cancellation request rejected','info');setTimeout(hideStatus,3000);
 }
 
 // ─── Admin panel ──────────────────────────────────────
 function openAdminLogin(){
-  if(isAdmin){renderAdminPanel();document.getElementById('adminOverlay').classList.add('open');return;}
+  if(isAdmin){document.getElementById('adminLoginWrap').style.display='none';document.getElementById('adminPanelWrap').style.display='block';renderAdminTab();document.getElementById('adminOverlay').classList.add('open');return;}
   document.getElementById('adminLoginWrap').style.display='block';
   document.getElementById('adminPanelWrap').style.display='none';
   document.getElementById('adminPassInput').value='';
@@ -1007,222 +1032,133 @@ function openAdminLogin(){
   setTimeout(()=>document.getElementById('adminPassInput').focus(),120);
 }
 function closeAdmin(){document.getElementById('adminOverlay').classList.remove('open');}
-
 function verifyAdmin(){
   if(document.getElementById('adminPassInput').value===ADMIN_PASSWORD){
     isAdmin=true;
+    document.getElementById('adminToggle').style.display='block';
     document.getElementById('adminToggle').classList.add('active');
     document.getElementById('adminLoginWrap').style.display='none';
     document.getElementById('adminPanelWrap').style.display='block';
-    renderAdminPanel();render();
-  } else {
-    showStatus('Incorrect password','err');
-    document.getElementById('adminPassInput').value='';
-  }
+    subscribeStaff();renderAdminTab();render();
+  } else {showStatus('Incorrect password','err');}
 }
 
-function renderAdminPanel(){
+function switchAdminTab(tab){
+  activeAdminTab=tab;
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>{
+    t.classList.toggle('active',['bookings','staff','pending'][i]===tab);
+  });
+  renderAdminTab();
+}
+
+function renderAdminTab(){
+  const content=document.getElementById('adminTabContent');
+  content.innerHTML='';
+  if(activeAdminTab==='bookings') renderBookingsTab(content);
+  else if(activeAdminTab==='staff') renderStaffTab(content);
+  else renderPendingTab(content);
+}
+
+function renderBookingsTab(el){
   const ds=currentDate.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('adminDateInfo').textContent=`Showing bookings for: ${ds}`;
-  const list=document.getElementById('adminList');list.innerHTML='';
+  el.innerHTML=`<div style="font-size:.76rem;color:var(--muted);margin-bottom:14px;">Bookings for: ${ds}</div>`;
   const seen=new Set();
   const keys=Object.keys(bookings).filter(k=>k.startsWith(`room1__${dateKey(currentDate)}`)).sort();
+  const pendingKeys=[],normalKeys=[];
+  keys.forEach(key=>{const bk=bookings[key];const gid=bk.groupId||key;if(seen.has(gid))return;seen.add(gid);if(bk.cancelRequested)pendingKeys.push(key);else normalKeys.push(key);});
 
-  // Separate pending cancellations from normal bookings
-  const pendingKeys=[], normalKeys=[];
-  keys.forEach(key=>{
-    const bk=bookings[key];
-    const gid=bk.groupId||key;
-    if(seen.has(gid))return;
-    seen.add(gid);
-    if(bk.cancelRequested) pendingKeys.push(key);
-    else normalKeys.push(key);
-  });
-
-  // ── Pending Cancellation section ──
   if(pendingKeys.length){
-    const header=document.createElement('div');
-    header.innerHTML=`<div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--gold);margin-bottom:10px;">⚠️ Pending Cancellation Requests (${pendingKeys.length})</div>`;
-    list.appendChild(header);
+    const h=document.createElement('div');h.innerHTML=`<div class="section-label" style="color:var(--gold)">⚠️ Cancel Requests (${pendingKeys.length})</div>`;el.appendChild(h);
     pendingKeys.forEach(key=>{
-      const bk=bookings[key];
-      const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-      const first=slots[0];const last=slots[slots.length-1];
-      const div=document.createElement('div');
-      div.className='abi';
-      div.style.borderColor='rgba(245,197,66,.4)';
-      div.style.background='rgba(245,197,66,.05)';
-      div.innerHTML=`
-        <div class="abi-info">
-          <div class="abi-name">${esc(bk.name)} <span style="color:var(--gold);font-size:.7rem;">— Cancel Requested</span></div>
-          ${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}
-          <div class="abi-meta">🕐 ${first} – ${nextTime(last)} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
-          <div class="abi-duration">⏱ ${durationLabel(slots)}</div>
-        </div>
-        <div class="abi-actions" style="flex-direction:column;gap:6px;">
-          <button class="sbtn" style="background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)!important;" onclick="approveCancel('${key}')">✅ Approve</button>
-          <button class="sbtn sbtn-edit" onclick="rejectCancel('${key}')">✕ Reject</button>
-        </div>`;
-      list.appendChild(div);
+      const bk=bookings[key];const slots=bk.slots||[key.split('__')[2].replace('h',':')];const first=slots[0],last=slots[slots.length-1];
+      const d=document.createElement('div');d.className='abi';d.style.borderColor='rgba(245,197,66,.4)';d.style.background='rgba(245,197,66,.05)';
+      d.innerHTML=`<div class="abi-info"><div class="abi-name">${esc(bk.name)}</div>${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}<div class="abi-meta">🕐 ${first} – ${nextTime(last)} · ${esc(bk.purpose)}</div><div class="abi-duration">⏱ ${durationLabel(slots)}</div></div>
+        <div class="abi-actions"><button class="sbtn" style="background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.3)!important;" onclick="approveCancel('${key}')">✅ Approve</button><button class="sbtn sbtn-edit" onclick="rejectCancel('${key}')">✕ Reject</button></div>`;
+      el.appendChild(d);
     });
-    if(normalKeys.length){
-      const sep=document.createElement('div');
-      sep.style.cssText='border-top:1px solid var(--border);margin:14px 0 12px;';
-      list.appendChild(sep);
-      const h2=document.createElement('div');
-      h2.innerHTML=`<div style="font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:10px;">📋 Active Bookings (${normalKeys.length})</div>`;
-      list.appendChild(h2);
-    }
+    const sep=document.createElement('div');sep.style.cssText='border-top:1px solid var(--border);margin:14px 0 12px;';el.appendChild(sep);
   }
-
-  if(!pendingKeys.length&&!normalKeys.length){
-    list.innerHTML='<div class="no-bookings">📭 No bookings for this date</div>';return;
+  if(!normalKeys.length&&!pendingKeys.length){el.innerHTML+='<div class="no-items">📭 No bookings for this date</div>';return;}
+  if(normalKeys.length){
+    const h=document.createElement('div');h.innerHTML=`<div class="section-label" style="color:var(--muted)">📋 Active Bookings (${normalKeys.length})</div>`;el.appendChild(h);
+    normalKeys.forEach(key=>{
+      const bk=bookings[key];const slots=bk.slots||[key.split('__')[2].replace('h',':')];const first=slots[0],last=slots[slots.length-1];
+      const d=document.createElement('div');d.className='abi';
+      d.innerHTML=`<div class="abi-info"><div class="abi-name">${esc(bk.name)}</div>${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}<div class="abi-meta">🕐 ${first} – ${nextTime(last)} · ${esc(bk.purpose)}</div><div class="abi-duration">⏱ ${durationLabel(slots)}</div></div>
+        <div class="abi-actions"><button class="sbtn sbtn-edit" onclick="openEdit('${key}');closeAdmin()">Edit</button><button class="sbtn sbtn-cancel" onclick="adminDel('${key}')">Delete</button></div>`;
+      el.appendChild(d);
+    });
   }
+}
 
-  // ── Normal bookings ──
-  normalKeys.forEach(key=>{
-    const bk=bookings[key];
-    const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-    const first=slots[0];const last=slots[slots.length-1];
-    const div=document.createElement('div');
-    div.className='abi';
-    div.innerHTML=`
-      <div class="abi-info">
-        <div class="abi-name">${esc(bk.name)}</div>
-        ${bk.dept?`<span class="abi-dept">${esc(bk.dept)}</span>`:''}
-        <div class="abi-meta">🕐 ${first} – ${nextTime(last)} &nbsp;·&nbsp; ${esc(bk.purpose)}</div>
-        <div class="abi-duration">⏱ ${durationLabel(slots)}</div>
-      </div>
-      <div class="abi-actions">
-        <button class="sbtn sbtn-edit" onclick="openEdit('${key}');closeAdmin()">Edit</button>
-        <button class="sbtn sbtn-cancel" onclick="adminDel('${key}')">Delete</button>
-      </div>`;
-    list.appendChild(div);
+function renderStaffTab(el){
+  const approved=Object.entries(staffList).filter(([,s])=>s.approved);
+  if(!approved.length){el.innerHTML='<div class="no-items">👥 No approved staff yet</div>';return;}
+  const h=document.createElement('div');h.innerHTML=`<div class="section-label" style="color:var(--green)">✅ Approved Staff (${approved.length})</div>`;el.appendChild(h);
+  approved.forEach(([uid,s])=>{
+    const d=document.createElement('div');d.className='staff-item';
+    d.innerHTML=`<div class="staff-av">${s.name[0].toUpperCase()}</div>
+      <div class="staff-info"><div class="staff-name">${esc(s.name)}</div><div class="staff-email">${esc(s.email)}</div><div class="staff-meta">${esc(s.empId||'')} · ${esc(s.dept)}</div><span class="staff-badge approved">Approved</span></div>
+      <div class="staff-actions"><button class="sbtn sbtn-cancel" onclick="revokeStaff('${uid}')">Revoke</button></div>`;
+    el.appendChild(d);
   });
 }
 
-// ─── User input ───────────────────────────────────────
-document.getElementById('userInput').addEventListener('input',function(){
-  userName=this.value.trim();updateAvatar();render();
-});
-function updateAvatar(){
-  document.getElementById('avatarEl').textContent=userName?userName[0].toUpperCase():'?';
+function renderPendingTab(el){
+  const pending=Object.entries(staffList).filter(([,s])=>!s.approved);
+  if(!pending.length){el.innerHTML='<div class="no-items">✅ No pending registrations</div>';return;}
+  const h=document.createElement('div');h.innerHTML=`<div class="section-label" style="color:var(--gold)">⏳ Pending Approvals (${pending.length})</div>`;el.appendChild(h);
+  pending.forEach(([uid,s])=>{
+    const d=document.createElement('div');d.className='staff-item';
+    d.innerHTML=`<div class="staff-av" style="background:var(--border2);color:var(--muted)">${s.name[0].toUpperCase()}</div>
+      <div class="staff-info"><div class="staff-name">${esc(s.name)}</div><div class="staff-email">${esc(s.email)}</div><div class="staff-meta">${esc(s.empId||'')} · ${esc(s.dept)}</div><span class="staff-badge pending">Pending</span></div>
+      <div class="staff-actions"><button class="sbtn sbtn-book" onclick="approveStaff('${uid}')">✅ Approve</button><button class="sbtn sbtn-cancel" onclick="rejectStaff('${uid}')">✕ Reject</button></div>`;
+    el.appendChild(d);
+  });
+}
+
+async function approveStaff(uid){
+  const{db,ref,set,get}=window._fb;
+  const snap=await get(ref(db,`staff/${uid}`));
+  if(!snap.exists())return;
+  await set(ref(db,`staff/${uid}`),{...snap.val(),approved:true,approvedAt:Date.now()});
+  showStatus('✅ Staff member approved!','ok');setTimeout(hideStatus,3000);
+}
+async function rejectStaff(uid){
+  if(!confirm('Reject and delete this registration?'))return;
+  const{db,ref,remove}=window._fb;
+  await remove(ref(db,`staff/${uid}`));
+  showStatus('Registration rejected','info');setTimeout(hideStatus,2500);
+}
+async function revokeStaff(uid){
+  if(!confirm('Revoke access for this staff member?'))return;
+  const{db,ref,set,get}=window._fb;
+  const snap=await get(ref(db,`staff/${uid}`));
+  if(!snap.exists())return;
+  await set(ref(db,`staff/${uid}`),{...snap.val(),approved:false});
+  showStatus('Access revoked','info');setTimeout(hideStatus,2500);
 }
 
 // ─── Date nav ─────────────────────────────────────────
-function changeDay(n){
-  clearSelection();
-  currentDate=new Date(currentDate);
-  currentDate.setDate(currentDate.getDate()+n);
-  subscribeDate();if(!firebaseOK)render();
-}
+function changeDay(n){clearSelection();currentDate=new Date(currentDate);currentDate.setDate(currentDate.getDate()+n);subscribeDate();if(!firebaseOK)render();}
 function goToday(){clearSelection();currentDate=today();subscribeDate();if(!firebaseOK)render();}
 
 // ─── Status ───────────────────────────────────────────
-function showStatus(msg,type){
-  const bar=document.getElementById('statusBar'),inner=document.getElementById('statusInner');
-  inner.className=`status-inner ${type}`;inner.textContent=msg;bar.classList.add('show');
-}
+function showStatus(msg,type){const bar=document.getElementById('statusBar'),inner=document.getElementById('statusInner');inner.className=`status-inner ${type}`;inner.textContent=msg;bar.classList.add('show');}
 function hideStatus(){document.getElementById('statusBar').classList.remove('show');}
 
 // ─── Overlay clicks ───────────────────────────────────
 ['bookOverlay','editOverlay','adminOverlay'].forEach(id=>{
   document.getElementById(id).addEventListener('click',e=>{
-    if(e.target.id===id){
-      if(id==='bookOverlay')closeBook();
-      else if(id==='editOverlay')closeEdit();
-      else closeAdmin();
-    }
+    if(e.target.id===id){if(id==='bookOverlay')closeBook();else if(id==='editOverlay')closeEdit();else closeAdmin();}
   });
 });
 
-// ─── Init ─────────────────────────────────────────────
-setTimeout(()=>{if(!firebaseOK){bookings={};render();}},900);
-render();
-
-// ─── PWA Install Prompt ───────────────────────────────
-let deferredInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  showInstallBanner();
-});
-
-function showInstallBanner(){
-  const banner = document.getElementById('installBanner');
-  if(banner) banner.style.display = 'flex';
-}
-
-function installApp(){
-  if(!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  deferredInstallPrompt.userChoice.then(()=>{
-    deferredInstallPrompt = null;
-    document.getElementById('installBanner').style.display = 'none';
-  });
-}
-
-function dismissInstall(){
-  document.getElementById('installBanner').style.display = 'none';
-}
-
-window.addEventListener('appinstalled', () => {
-  document.getElementById('installBanner').style.display = 'none';
-  showStatus('✅ App installed! Find "Sanken Booking" on your home screen.','ok');
-  setTimeout(hideStatus, 4000);
-});
-
-// ─── Service Worker ───────────────────────────────────
-if('serviceWorker' in navigator){
-  const swCode = `
-    const CACHE = 'sanken-booking-v1';
-    const ASSETS = ['/sanken-booking/'];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS).catch(()=>{})));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(caches.keys().then(keys =>
-        Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
-      ));
-      self.clients.claim();
-    });
-    self.addEventListener('fetch', e => {
-      if(e.request.method !== 'GET') return;
-      e.respondWith(
-        fetch(e.request).catch(() => caches.match(e.request))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], {type:'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(()=>{});
-}
+// ─── PWA Install ──────────────────────────────────────
+let deferredInstallPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstallPrompt=e;document.getElementById('installBanner').style.display='flex';});
+function installApp(){if(!deferredInstallPrompt)return;deferredInstallPrompt.prompt();deferredInstallPrompt.userChoice.then(()=>{deferredInstallPrompt=null;document.getElementById('installBanner').style.display='none';});}
+function dismissInstall(){document.getElementById('installBanner').style.display='none';}
 </script>
-<!-- PWA Install Banner -->
-<div id="installBanner" style="display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:500;
-  background:linear-gradient(135deg,#1e2d4a,#192038);
-  border:1px solid rgba(245,197,66,.4);border-radius:16px;
-  padding:14px 18px;box-shadow:0 8px 32px rgba(0,0,0,.5);
-  align-items:center;gap:14px;max-width:360px;width:calc(100% - 32px);
-  animation:slideUp .3s ease;">
-  <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,#f5c542,#e8a820);
-    display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#000;flex-shrink:0;">S</div>
-  <div style="flex:1;min-width:0;">
-    <div style="font-size:.82rem;font-weight:700;color:#f0f2f8;">Add to Home Screen</div>
-    <div style="font-size:.72rem;color:#7b8ab8;margin-top:2px;">Install Sanken Booking as an app</div>
-  </div>
-  <div style="display:flex;gap:8px;flex-shrink:0;">
-    <button onclick="dismissInstall()" style="background:transparent;border:1px solid #2d3650;color:#7b8ab8;
-      padding:7px 12px;border-radius:8px;cursor:pointer;font-size:.75rem;font-family:'Plus Jakarta Sans',sans-serif;">Later</button>
-    <button onclick="installApp()" style="background:linear-gradient(135deg,#f5c542,#e8a820);border:none;color:#000;
-      padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.75rem;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;">Install</button>
-  </div>
-</div>
-
-<style>
-@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
-</style>
-
 </body>
 </html>
