@@ -375,7 +375,24 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
         </div>
         <div class="fgroup">
           <label>Password</label>
-          <input type="password" id="loginPass" placeholder="Enter your password" onkeydown="if(event.key==='Enter')doLogin()">
+          <div style="position:relative;">
+            <input type="password" id="loginPass" placeholder="Enter your password" autocomplete="current-password"
+              onkeydown="if(event.key==='Enter')doLogin()"
+              style="width:100%;padding-right:44px;">
+            <button onclick="togglePassVis()" type="button"
+              style="position:absolute;right:12px;top:50%;transform:translateY(-50%);
+              background:none;border:none;cursor:pointer;color:var(--muted);font-size:1rem;padding:0;"
+              id="passVisBtn" title="Show/hide password">👁️</button>
+          </div>
+        </div>
+        <!-- Remember Me -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.8rem;color:var(--muted);font-weight:500;text-transform:none;letter-spacing:0;">
+            <input type="checkbox" id="rememberMe"
+              style="width:16px;height:16px;accent-color:var(--gold);cursor:pointer;background:var(--bg2);border:1px solid var(--border2);">
+            Remember me
+          </label>
+          <span style="font-size:.75rem;color:var(--muted2);">Stays logged in on this device</span>
         </div>
         <button class="auth-btn" onclick="doLogin()">🔑 Login</button>
       </div>
@@ -656,6 +673,8 @@ window.addEventListener('firebase-ready',()=>{
   if(saved){
     const u=JSON.parse(saved);
     verifyStoredSession(u);
+  } else {
+    loadRemembered();
   }
 });
 
@@ -719,7 +738,15 @@ async function doLogin(){
   if(!firebaseOK){alert('Connecting to server, please wait…');return;}
   const email=document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass=document.getElementById('loginPass').value;
+  const remember=document.getElementById('rememberMe').checked;
   if(!email||!pass){showAuthStatus('Please enter your email and password','err');return;}
+
+  // Save or clear remembered credentials
+  if(remember){
+    localStorage.setItem('sanken_remember',JSON.stringify({email,pass}));
+  } else {
+    localStorage.removeItem('sanken_remember');
+  }
 
   // Check admin superlogin
   if(email==='admin' && pass===ADMIN_PASSWORD){
@@ -743,6 +770,27 @@ async function doLogin(){
   } catch(e){showAuthStatus('Login failed. Please try again.','err');}
 }
 
+// ─── Show/hide password ───────────────────────────────
+function togglePassVis(){
+  const inp=document.getElementById('loginPass');
+  const btn=document.getElementById('passVisBtn');
+  if(inp.type==='password'){inp.type='text';btn.textContent='🙈';}
+  else{inp.type='password';btn.textContent='👁️';}
+}
+
+// ─── Auto-fill remembered credentials ────────────────
+function loadRemembered(){
+  const saved=localStorage.getItem('sanken_remember');
+  if(saved){
+    try{
+      const{email,pass}=JSON.parse(saved);
+      document.getElementById('loginEmail').value=email||'';
+      document.getElementById('loginPass').value=pass||'';
+      document.getElementById('rememberMe').checked=true;
+    } catch(e){}
+  }
+}
+
 // ─── Auth helpers ─────────────────────────────────────
 function showAuthStatus(msg,type){
   let el=document.getElementById('authStatus');
@@ -764,6 +812,7 @@ function showAuthScreen(){
   document.getElementById('appScreen').style.display='none';
   document.getElementById('loginPanel').style.display='block';
   document.getElementById('pendingPanel').style.display='none';
+  loadRemembered();
 }
 
 // ─── Enter App ────────────────────────────────────────
