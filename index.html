@@ -410,7 +410,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
             <option>Green Art</option>
             <option>Legal &amp; Compliance</option>
             <option>Management</option>
-            <option>Mechanical</option>
           </select>
         </div>
         <div class="fgroup">
@@ -515,7 +514,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
       <div class="room-icon">🏛️</div>
       <div class="room-title"><h2>Boardroom</h2><p>1st Floor Meeting Room</p></div>
       <div class="room-badges">
-        <span class="badge badge-cap">👥 8 People</span>
+        <span class="badge badge-cap">👥 11 People</span>
         <span class="badge" id="availBadge">– Available</span>
       </div>
     </div>
@@ -532,7 +531,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
   <div class="leg-item"><div class="leg-dot" style="background:var(--green)"></div>Your booking</div>
 </div>
 
-<div class="footer">© Copyright : Administration Department – Sanken Overseas Pvt Ltd · All rights reserved</div>
+<div class="footer">© Copyright : Administration Department – Sanken Overseas Pvt Ltd · All Rights Reserved</div>
 
 </div><!-- end appScreen -->
 
@@ -889,7 +888,7 @@ function render(){
       </div>`;
       if(mine){
         if(bk.cancelRequested) actions+=`<button class="sbtn sbtn-pending" disabled>⏳ Pending…</button>`;
-        else actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();requestCancel('${key}')">Request Cancel</button>`;
+        else actions+=`<button class="sbtn sbtn-cancel" onclick="event.stopPropagation();requestCancel('${key}',true)">Request Cancel</button>`;
       }
       if(isAdmin){
         actions+=`<button class="sbtn sbtn-edit" onclick="event.stopPropagation();openEdit('${key}')">Edit</button>`;
@@ -968,12 +967,32 @@ async function confirmBook(){
   setTimeout(hideStatus,3500);
 }
 
-// ─── Request cancel ───────────────────────────────────
-async function requestCancel(key){
+// ─── Request cancel (individual or full group) ────────
+async function requestCancel(key, individualOnly=false){
   const bk=bookings[key];if(!bk)return;
-  const slots=bk.slots||[key.split('__')[2].replace('h',':')];
-  if(!confirm(`Request cancellation of your ${durationLabel(slots)} booking?\nAdmin will review and approve.`))return;
-  for(const t of slots){const k=slotKey(t);if(bookings[k]) await fbSet(k,{...bookings[k],cancelRequested:true,cancelRequestedAt:Date.now()});}
+  const allSlots=bk.slots||[key.split('__')[2].replace('h',':')];
+  const thisSlotTime=key.split('__')[2].replace('h',':');
+  const isGroup=allSlots.length>1;
+  let slotsToCancel=allSlots;
+
+  if(isGroup && individualOnly){
+    const choice=confirm(
+      `This is a ${durationLabel(allSlots)} group booking (${allSlots.length} slots).\n\n`+
+      `Press OK to cancel ONLY the ${thisSlotTime} slot.\nPress Cancel to cancel the ENTIRE booking.`
+    );
+    slotsToCancel = choice ? [thisSlotTime] : allSlots;
+  }
+
+  const label = slotsToCancel.length===1
+    ? `slot ${slotsToCancel[0]}`
+    : `entire ${durationLabel(slotsToCancel)} booking`;
+
+  if(!confirm(`Request cancellation of your ${label}?\nAdmin will review and approve.`))return;
+
+  for(const t of slotsToCancel){
+    const k=slotKey(t);
+    if(bookings[k]) await fbSet(k,{...bookings[k],cancelRequested:true,cancelRequestedAt:Date.now()});
+  }
   showStatus('⏳ Cancellation request sent — awaiting admin approval','info');
   setTimeout(hideStatus,4000);
 }
