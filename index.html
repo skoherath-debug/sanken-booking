@@ -402,11 +402,12 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
             <option>Administration</option>
             <option>Finance &amp; Accounts</option>
             <option>Human Resources</option>
-            <option>Sales &amp; Marketing</option>
-            <option>Operations</option>
             <option>Information Technology</option>
+            <option>Engineering</option>
+            <option>DEK</option>
             <option>Procurement</option>
-            <option>Logistics</option>
+            <option>QS</option>
+            <option>Green Art</option>
             <option>Legal &amp; Compliance</option>
             <option>Management</option>
           </select>
@@ -560,10 +561,11 @@ body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:1
       <select id="eDept">
         <option value="">— Select —</option>
         <option>Administration</option><option>Finance &amp; Accounts</option>
-        <option>Human Resources</option><option>Sales &amp; Marketing</option>
-        <option>Operations</option><option>Information Technology</option>
-        <option>Procurement</option><option>Logistics</option>
-        <option>Legal &amp; Compliance</option><option>Management</option>
+        <option>Human Resources</option><option>Information Technology</option>
+        <option>Engineering</option><option>DEK</option>
+        <option>Procurement</option><option>QS</option>
+        <option>Green Art</option><option>Legal &amp; Compliance</option>
+        <option>Management</option>
       </select>
     </div>
     <div class="fgroup"><label>Meeting Purpose</label><input type="text" id="ePurpose" maxlength="60"></div>
@@ -693,7 +695,7 @@ async function doRegister(){
   const pass=document.getElementById('regPass').value;
   if(!name||!email||!empId||!dept||!pass){showAuthStatus('Please fill in all fields','err');return;}
   if(pass.length<6){showAuthStatus('Password must be at least 6 characters','err');return;}
-  if(!email.includes('@')){showAuthStatus('Please enter a valid email','err');return;}
+  if(!email.endsWith('@sankenoverseas.com')){showAuthStatus('Only @sankenoverseas.com email addresses are allowed','err');return;}
 
   const uid=emailToUid(email);
   const{db,ref,get,set}=window._fb;
